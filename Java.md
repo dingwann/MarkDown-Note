@@ -1,6 +1,6 @@
 # Java语言特点
 
-Java由C++开发作为可以跨平台的面向对象语言，其特点是**一次编译，到处运行**和**自动垃圾回收机制**
+Java由C++开发作为可以跨平台的面向对象语言，其特点是**一次编译，到处运行（跨平台）**和 **自动垃圾回收机制**
 
 跨平台的原因是Java在各平台都有其 JVM (Java的虚拟机)
 
@@ -376,7 +376,7 @@ long e = 2147483648  // 整型溢出
 
 **强制类型转换**
 
-大  ----> 小，可能造成精度损失，原理就是砍掉左侧多余的二进制
+**大  ----> 小，可能造成精度损失，原理就是砍掉左侧多余的二进制**
 
 精度损失与否看转换后类型能否存下
 
@@ -500,7 +500,7 @@ double y = 123.34E-2;  // 123.34 / 10^2（123.34 * 10^-2）
 
 **一旦有浮点型数据参与运算得出的结果，一定不要用 “==” 与其他数字进行 “相等比较”**
 
-因为浮点型数据在计算机底层存储的是它的近似值。
+**因为浮点型数据在计算机底层存储的是它的近似值。**
 
 
 
@@ -534,7 +534,7 @@ b = c
 
 ​			char和short能表示的数量一样
 
-4.在java中，字符char类型需用单引号‘’
+4.在java中，字符char类型需用单引号‘ ‘
 
 5.在Java中char类型统一采用的字符编码格式：unicode
 
@@ -670,7 +670,7 @@ public class test {
     public static void main(String[] args) {
         int a = 10;
         int b = ++a;
-        // 先赋值运算再自加
+        // 先自加再赋值运算
         System.out.println(a); // 11
         System.out.println(b); // 11
     }
@@ -683,8 +683,7 @@ public class test {
 public class test {
     public static void main(String[] args) {
         int a = 10;
-        int b = ++a;
-        // 先赋值运算再自加
+        // 先自加再赋值运算
         System.out.println(a++); // 10,和底层源码有关
         System.out.println(a); // 11
     }
@@ -749,7 +748,7 @@ public class test {
 
 **bipush 和 istore_1**
 
-在Java中，任何一个方法执行时都会为这个方法分配专属得内存空间供其使用，其中有两块比较重要得内存空间。
+在Java中，**任何一个方法执行时都会为这个方法分配专属得内存空间供其使用，其中有两块比较重要得内存空间。**
 
 **一块叫局部变量表（存储局部变量）**
 
@@ -1174,65 +1173,363 @@ for(int i = 0; i < 10; i++) {  // 初始化表达式;条件表达式;更新表�
 
 #### 2. while
 
-
-
-
-
-
-
-
+![image-20240725173528255](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202407251735497.png)
 
 
 
 #### 3. do while
 
+![image-20240725174635838](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202407251746931.png)
 
+do while 无论如何先执行一次。
 
-
-
-
-
-
+**特别注意：while() 后面有;**
 
 
 
 ### 跳转语句
 
+<img src="https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202407251912224.png" alt="image-20240725191240129" style="zoom:80%;" />
+
 #### 1. break
 
+默认终止当前层循环，但是可以指定，但是使用较少。
 
-
-
-
-
-
-
-
-
+![image-20240725191703089](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202407251917154.png)
 
 #### 2. continue
 
+跳出本次循环体执行的操作，不进行终止循环。
+
+continue也可以加标记进行控制循环
 
 
 
+**注意：**
 
+**return 进行方法的终止**
 
-
-
-
-
-
-
-
-
-
-
-
-
+**break 进行循环的终止**
 
 
 
 ## 方法
+
+![image-20240725193029293](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202407251930415.png)
+
+设计方法应该达到解耦、高复用、独立性。
+
+```java
+public class test {
+    public static void main(String[] args) {
+        sum(2,6);  // 方法调用
+        sum(8,10);
+    }
+	
+    // 方法定义
+    public static void sum(int a, int b) {
+        int sum = a + b;
+        System.out.println(sum);
+    }
+}
+```
+
+**JVM调用的main方法**
+
+
+
+#### 方法定义
+
+``` java
+// 语法格式   [可选项]
+[修饰符列表] 返回值类型 方法名(形式参数列表) {
+    方法体;
+}
+
+// 目前修饰符统一写 public static
+// 返回值类型可以是java中任何一种数据类型（基本数据类型、引用数据类型）
+// 如果方法执行结束时不返回任何数据给调用者写void，不能空着不写。
+```
+
+当返回值类型不是void的时候，方法程序结束时必须用 return 值来完成数据的返回
+
+```java
+public static void m() {
+    return;
+}
+// 可以编译，因为并没有返回值
+// 这里的return的作用就是结束方法
+```
+
+
+
+**当调用方法要接收时，定义的变量类型要和方法返回值类型一致或者能够进行自动类型转换。**
+
+**可以选择不接收返回值。**
+
+
+
+#### 方法的调用
+
+**如果一个方法的修饰符列表有 static 那么调用的时候就得用类名.方法名(实际参数列表);**
+
+实参和形参的类型和个数都要一一对应。
+
+```java
+public class test {
+    public static void main(String[] args) {
+        // 省略类名
+        sum(2,6);
+        // 类名.方法名();
+        test.sum(8,10);
+        // 调用A类的方法haha
+        A.haha();
+    }
+
+    public static void sum(int a, int b) {
+        int sum = a + b;
+        System.out.println(sum);
+    }
+}
+
+class A {
+    public static void haha() {
+        System.out.println("haha");
+    }
+}
+```
+
+**类体中调用方法可以省略类名**
+
+**类不一样时不能省**
+
+
+
+判断1-100的质数：
+
+```java
+public class test {
+    public static void main(String[] args) {
+        for(int i = 1; i <= 100; i++) {
+            if(isPrime(i)) {
+                System.out.println(i);
+            }
+        }
+    }
+
+    public static boolean isPrime(int x) {
+        for(int i = 2; i <= (int)Math.sqrt(1.0 * x); i++) {
+            if(x % i == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+```
+
+
+
+#### 方法执行的内存图
+
+**方法如果只定义不调用是不会分配内存空间的（从Java8开始，方法的字节码存储在元空间 metaspace 中，元空间使用的是本地内存）**
+
+**方法调用的瞬间，会在栈内存中分配活动场所，此时会发生push压栈动作。**
+
+**方法结束，给该方法分配的空间就会释放，pop弹栈操作**
+
+```java
+public class test {
+    public static void main(String[] args) {
+        System.out.println("main start");
+        m1();
+        System.out.println("main end");
+    }
+    
+    public static void m1() {
+        System.out.println("m1 start");
+        m2();
+        System.out.println("m1 end");
+    }
+
+    public static void m2() {
+        System.out.println("m2 start");
+        m3();
+        System.out.println("m2 end");
+    }
+
+    public static void m3() {
+        System.out.println("m3 start");
+        System.out.println("m3 end");
+    }
+}
+
+// 结果
+main start
+m1 start
+m2 start
+m3 start
+m3 end
+m2 end
+m1 end
+main end
+```
+
+------
+
+![image-20240725211441320](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202407252114440.png)
+
+**元空间也是JVM的一部分，只不过用的是本地内存（为了解决OOM问题 Out Of Memory）**
+
+
+
+#### 方法重载机制(overload)
+
+<img src="https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202407252142651.png" alt="image-20240725214259546" style="zoom:80%;" />
+
+```java
+public class test {
+    public static void main(String[] args) {
+
+    }
+
+    public static void m(int a, int b) {
+        System.out.println(a + b);
+    }
+    
+    public static void m(int a, int b, int c) {
+        System.out.println(a + b + c);
+    }
+}
+
+```
+
+#### 递归
+
+![image-20240725221241036](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202407252212145.png)
+
+
+
+#### package
+
+![image-20240726120348789](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202407261203902.png)
+
+用了package后类名叫包名.类名
+
+加了package的要在对应文件夹中
+
+```java
+package com;
+
+java com.类名运行
+```
+
+加-d . 进行编译自动生成
+
+
+
+#### import
+
+![image-20240726121815076](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202407261218161.png)
+
+import 在 package 和 代码中间部分
+
+同一包下不需要调用 import
+
+
+
+## IDEA
+
+Alt + Insert == 新建任何东西 ----> 输入即可
+
+ESC == 关闭任何窗口
+
+Ctrl + Shift + F12 == 代码区全屏开/关
+
+psvm == 生成main方法
+
+sout == 打印方法
+
+“Hello World!”.sout == 自动生成对应打印语句
+
+IDEA 自动保存、自动编译
+
+Alt + 编号 == 开/关对应窗口  Alt+1 == 项目窗口  Alt+4 ==Terminal 
+
+两次 Shift 选择类 输入类名 == 查找类
+
+Ctrl + / == 单行注释
+
+Ctrl + Shift + / == 多行注释
+
+Alt + 左右 == 切换窗口（Tab 和 Shift+Tab也行）
+
+Ctrl + y == 删除一行
+
+Ctrl + d == 复制一行
+
+fori == 生成for循环语句
+
+在类中查找方法 == Ctrl + F12
+
+
+
+## 面向对象（得精通）
+
+一种开发方式，Java、Python、C#都是支持的
+
+![image-20240726144315028](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202407261443176.png)
+
+![image-20240726150520410](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202407261505507.png)
+
+### 类与对象
+
+![image-20240726150741499](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202407261507614.png)
+
+#### 类
+
+![image-20240726183343817](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202407261833948.png)
+
+
+
+#### 对象的创建和使用
+
+成员变量没有手动赋值时，系统默认赋值。
+
+```java
+package dingwan;
+
+public class Student {
+    // 实例变量
+    String name;
+    int age;
+    boolean gender;
+    
+}
+
+```
+
+```java
+package dingwan;
+
+public class Student {
+    public static void main(String[] args) {
+        Study s1 = new Study();
+        // 访问
+        System.out.println(s1.name);
+        System.out.println(s1.age);
+        System.out.println(s1.gender ? "男" : "女");
+        
+        // 修改
+        s1.name = "wangcai"
+    }
+}
+
+```
+
+### JVM内存分析
+
+
 
 
 
