@@ -352,9 +352,9 @@ b1e2转为二进制：
 
 
 
-整数型字面量会默认当作int处理
+**整数型字面量会默认当作int处理**
 
-java允许小容量赋值给大容量变量
+**java允许小容量赋值给大容量变量**
 
 **byte < short < int < long < float < double**
 
@@ -378,7 +378,7 @@ long e = 2147483648  // 整型溢出
 
 **大  ----> 小，可能造成精度损失，原理就是砍掉左侧多余的二进制**
 
-精度损失与否看转换后类型能否存下
+**精度损失与否看转换后类型能否存下**
 
 ```java
 byte = (byte)150;  // ()强制转换
@@ -530,19 +530,19 @@ b = c
 
 ​			char和short都是2字节
 
-​			char可以取到更大的正整数（因为char没有负数范围）
+​			**char可以取到更大的正整数（因为char没有负数范围）**
 
-​			char和short能表示的数量一样
+​			**char和short能表示的数量一样**
 
 4.在java中，字符char类型需用单引号‘ ‘
 
 5.在Java中char类型统一采用的字符编码格式：unicode
 
-6.char可以存储一个汉字
+**6.char可以存储一个汉字**
 
-7.char不允许放空字符
+**7.char不允许放空字符**
 
-8.char默认值：\u0000
+**8.char默认值：\u0000**
 
 
 
@@ -700,9 +700,11 @@ public class test {
 
 ![image-20240722171033611](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202407221710714.png)
 
-查看class文件得字节码：
+查看class文件的字节码：
 
-**javap -c 文件名.class**
+>  **javap -c 文件名.class**
+
+
 
 ```java
 public class test {
@@ -907,7 +909,8 @@ public class test {
         System.out.println(i);  // 10
     }
 }
-// 底层实际操作为,具体可看字节码过程。
+
+// 底层实际操作为,具体可看字节码过程。  bipush 10  istore_1  iload_1  iinc 1,1 istore_1
 int i = 10;
 int temp = i;
 i++;
@@ -1029,7 +1032,7 @@ m = m + 20;
 m += 20;   // 这样可以，底层对应的是m = (byte)(m + 20);
 ```
 
-**对于扩展运算符，例如+= -= /= ，根据变量类型进行自动强转，哪怕损失精度**
+**对于扩展运算符，例如+=   -=   /= ，根据变量类型进行自动强转，哪怕损失精度**
 
 
 
@@ -1234,7 +1237,7 @@ public class test {
 }
 ```
 
-**JVM调用的main方法**
+**JVM默认调用的main方法**
 
 
 
@@ -1379,7 +1382,7 @@ main end
 
 ![image-20240725211441320](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202407252114440.png)
 
-**元空间也是JVM的一部分，只不过用的是本地内存（为了解决OOM问题 Out Of Memory）**
+**元空间也是JVM的一部分，只不过用的是本地内存（为了解决OOM(Out Of Memory) 内存溢出问题）**
 
 
 
@@ -1476,6 +1479,8 @@ fori == 生成for循环语句
 
 （布尔类型）.if == 生成if语句
 
+Alt + Enter == 纠错
+
 
 
 ## 面向对象（得精通）
@@ -1516,9 +1521,9 @@ public class Student {
 ```java
 package dingwan;
 
-public class Student {
+public class StudentTest {
     public static void main(String[] args) {
-        Study s1 = new Study();
+        Student s1 = new Student();
         // 访问
         System.out.println(s1.name);
         System.out.println(s1.age);
@@ -1536,9 +1541,9 @@ public class Student {
 ```java
 package dingwan;
 
-public class Student {
+public class StudentTest {
     public static void main(String[] args) {
-        Study s1 = new Study();
+        Student s1 = new Student();
         System.out.println(s1.name);
         System.out.println(s1.age);
         System.out.println(s1.gender ? "男" : "女");
@@ -1652,7 +1657,7 @@ this也是个引用，代表当前的对象。
 
 #### 属性私有化
 
-使用 private 进行修饰，所有被 private 修饰的都是私有的，私有的只能在本类中访问。
+使用 private 进行修饰，所有被 private 修饰的都是私有的，**私有的只能在本类中访问。**
 
  ```java
  private int age;
@@ -1666,7 +1671,7 @@ this也是个引用，代表当前的对象。
 public 返回值类型 getAge() {}
 ```
 
-改：s	etter
+改：setter
 
 ```java
 public void setAge(int age) {}
@@ -1674,7 +1679,8 @@ public void setAge(int age) {}
 
 ```java
 public void setAge(int age) {
-    age = age
+    age = age;
+    this.age = age;
 }
 // 这时候的前面个age应该指对象的属性，所以要加this进行区分
 ```
@@ -1691,19 +1697,176 @@ public void setAge(int age) {
 
 说白了还是加this.就行
 
-注意就是static方法不能调实例方法也不能用this，因为static方法是不需要new对象的，所以方法并没有存this。
+注意就是static方法不能调实例方法也不能用this，因为static方法是不需要new出对象的，所以方法并没有存this。
 
 
 
-​	构造代码块
+**构造代码块**
 
 ```java
 {
     
 }
-new的时候默认调用一次，在构造方法之前执行，也能用this。
+每次new的时候默认调用一次，在构造方法之前执行，也能用this。
     
 // 如果所有的构造方法在开头有相同的代码，就可以将公共的代码放在构造代码块里面。
+```
+
+
+
+### 构造方法
+
+![image-20240802145129572](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408021451826.png)
+
+作用：对象的创建（调用构造方法即可完成创建）
+
+​			对象的初始化（属性赋值）
+
+```java
+// [修饰符] 构造方法名(形参列表) {
+	// 构造方法体
+}
+// 使用new运算符调用
+```
+
+构造方法名 == 类名（必须）
+
+> #### 构造方法会将new出的对象内存地址返回，但是我们不需要写 return，也不需要写返回值类型。
+
+
+
+### this 关键字
+
+![image-20240802162902130](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408021629339.png)
+
+<img src="https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408021700916.png" alt="image-20240802170003746" style="zoom: 80%;" />
+
+个人理解：
+
+调用构造方法之前对象已经创建，现在的this指向创建好的对象，向其传递三个参数，即默认去匹配构造方法。
+
+
+
+### static 关键字
+
+![image-20240802170543915](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408021705036.png)
+
+**当一个属性是类级别的，就是类都有而且属性值一样，建议定义为static，在内存上只有一份，节省空间。**
+
+**这种级别的属性不需要new对象，只需要类名.去访问**
+
+**JDK8之后，静态变量存储在堆内存当中。**
+
+静态变量什么时候开辟？
+
+**执行时，在metaspace里进行类加载，加载类时，会在里面找有没有static，有的话就在堆内存中开辟空间。**
+
+> ####  注意：类加载是在执行main方法之前执行的。
+
+<img src="https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408041306531.png" alt="image-20240804130601376" style="zoom: 67%;" />
+
+静态变量可以通过引用.属性访问，但是不推荐。
+
+```java
+public static void main(String[] args) {
+    Chinese lisi = new Chinese();
+    
+    
+    System.out.println(lisi.xxx);
+    System.out.println(Chinese.xxx);
+    // 但是如果让lisi指向null后还能访问
+    lisi = null;
+    
+    // 仍然不报错，因为执行时会默认将lisi改为其类名Chinese
+    System.out.println(lisi.xxx);
+}
+```
+
+静态代码块
+
+```java
+static {
+    xxxxxxxxx;
+}
+
+public static void main(String[] args) {
+    xxxxxx;
+}
+```
+
+**类加载时执行，而且只执行一次。**
+
+**静态代码块可以写多个，遵循自上而下的顺序执行。**
+
+
+
+### 设计模式
+
+![image-20240804142727417](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408041427545.png)
+
+#### 单例模式
+
+只需要创建一个对象。
+
+> **饿汉式单例模式**
+
+```java
+/*
+构造方法私有化。
+对外提供一个公开的静态方法，用这个方法获取单个实例。
+定义一个静态变量，在类加载的时候初始化静态变量。（只初始化一次）
+*/
+public class Sigleton {
+    private static Sigleton s = new Sigleton();
+    
+    private Sigleton() {
+    }
+    
+    public static Sigleton get() {
+        return s;
+    }
+    
+}
+```
+
+```java
+public class SigletonTest {
+    public static void main(String[] args) {
+        Sigleton s1 = Sigleton.get();
+    }
+}
+```
+
+> **懒汉式单例模式**
+
+```java
+/*
+构造方法私有化。
+对外提供一个公开的静态方法，用这个方法获取单个实例。
+定义一个静态变量，值为null。
+*/
+public class Sigleton {
+    private static Sigleton s = null;
+    
+    private Sigleton() {
+    }
+    
+    public static Sigleton get() {
+        if(s == null) {
+            s = new Sigleton();
+        }
+        return s;
+    }
+    
+}
+```
+
+```java
+public class SigletonTest {
+    public static void main(String[] args) {
+        Sigleton s1 = Sigleton.get();
+    }
+}
 ```
 
 
@@ -1721,4 +1884,52 @@ new的时候默认调用一次，在构造方法之前执行，也能用this。
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Java 虚拟机规范
+
+HotSpot ---->  Oeacle JDK、Open JDK在用
+
+![image-20240804135113024](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408041351144.png)
+
+>  **Run-Time Data Areas**
+
+![image-20240804135000558](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408041350703.png)
+
+> **JDK6:**
+
+![image-20240804140852448](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408041408531.png)
+
+![image-20240804141125260](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408041411339.png)
+
+
+
+> **JDK7:**
+
+![image-20240804141109691](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408041411779.png)
+
+![image-20240804141208598](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408041412667.png)
+
+> **JDK8**+
+
+![image-20240804141654791](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408041416895.png)
+
+![image-20240804141356441](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408041413507.png)
 
