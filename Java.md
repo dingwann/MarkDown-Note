@@ -1073,7 +1073,7 @@ if() {
 if() xxx;
 ```
 
-字符串比较不能用 == ，必须手动调用equals方法进行比较
+**字符串比较不能用 == ，必须手动调用equals方法进行比较**
 
 ```java
 String name = "wangcai"
@@ -1481,6 +1481,12 @@ fori == 生成for循环语句
 
 Alt + Enter == 纠错
 
+Shift + Alt + 上下方向键 == 移动代码
+
+Ctrl + o == 重写方法
+
+变量名.castvar == 快速向下转型并生成变量名
+
 
 
 ## 面向对象（得精通）
@@ -1552,10 +1558,11 @@ public class StudentTest {
         s1.age = 18;
         s1.gender = true;
         
-        Study s2 = new Study();
+        Study s2 = new Student();
     }
 }
 // s1和s2是引用，保存的对象的内存地址
+// 将图里的Study改为StudentTest
 ```
 
 ![image-20240727170349219](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202407271703435.png)
@@ -1571,7 +1578,7 @@ public class StudentTest {
 #### 空指针异常的发生
 
 ```java
-Student s1 = new Student;
+Student s1 = new Student();
 
 s1 = null;
 
@@ -1871,29 +1878,712 @@ public class SigletonTest {
 
 
 
+### 继承
+
+![image-20240808122348109](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408081223344.png)
+
+```java
+[修饰符] class 类名 extends 父类 {
+    
+}
+// 除了构造方法和私有属性、方法无法继承外其余全部继承。
+```
+
+**Java中没有显式继承类时，默认继承Object**
+
+**Object是JDK类库中的根类（java.lang.Object）**
+
+### 方法覆盖
+
+<img src="https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408081354740.png" alt="image-20240808135457451" style="zoom: 80%;" />
+
+从父类继承的方法不够业务场景时考虑方法重写（覆盖）
+
+```java
+public class Animal {
+    public void eat() {
+        System.out.println("eat...")
+    }
+    
+    public void move() {
+        System.out.println("move...")
+    }
+}
+```
+
+```java
+public class Bird extends Animal {
+    // 对继承的move不满意，需要改进就进行重写（覆盖）
+    @Override
+    public void move() {
+        System.out.println("flying...")
+    }
+}
+```
+
+方法覆盖后，子类对象调用的时候是执行重写后的方法。
+
+```java
+@Override
+// 只在编译阶段有用
+// 该注解用来标注方法，用来标注的方法必须是重写的方法，不然报错。
+```
+
+![image-20240808141814629](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408081418732.png)
+
+> **3.4 访问权限不能变低可以变高。public protected 默认 private**
+>
+> **3.5 抛出异常不能变多，只能变少。**
+
+
+
+### 多态
+
+![image-20240808151322743](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408081513956.png)
+
+- #### **因为多态和方法重写是相关联的，多态是父类型的引用指向子类型对象，但是静态方法的调用不需要对象的参与，那么静态方法也就和多态无关了，自然也和方法重写无关。**
+
+- #### **方法覆盖针对的实例方法，和实例变量无关，编译时变量绑定的什么对象，执行就是什么对象的属性**
+
+
+
+#### 向上转型和向下转型
+
+> **除了基本数据类型之间转换外，对于引用数据类型也可以类型转换，也就是向上转型和向下转型**
+
+**向上转型（upcasting）：**子 ----> 父（可以等同看作基本数据类型的**自动**类型转换）
+
+**向下转型（downcasting）：**父 ----> 子（可以等同看作基本数据类型的**强制**类型转换）
+
+<img src="https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408081530900.png" alt="image-20240808153042813" style="zoom: 67%;" />
+
+- ### **前提是两种类型必须有继承关系才能编译通过。**
+
+```java
+package test;
+
+public class Animal {
+    public void eat() {
+        System.out.println("eat");
+    }
+}
+
+```
+
+```java
+package test;
+
+public class Cat extends Animal {
+    @Override
+    public void eat() {
+        System.out.println("cat eat...");
+    }
+    
+    // 子类特有方法，父类没有
+    public void catchMouse() {
+        System.out.println("catchMouse...");
+    }
+}
+
+```
+
+```java
+package test;
+
+public class Bird extends Animal {
+    @Override
+    public void eat() {
+        System.out.println("bird eat...");
+    }
+    
+}
+
+```
+
+测试：
+
+```java
+package test;
+
+public class Test {
+    public static void main(String[] args) {
+        Animal a = new Animal();
+        Bird b = new Bird();
+        Cat c = new Cat();
+        
+        a.eat();
+        b.eat();
+        c.eat();
+        
+        /*
+          向上转型（upcasting）：子 ----> 父
+          等同看作自动类型转换
+          两种关系具有继承
+          父类型引用指向子类型对象
+        */
+        Animal a2 = new Cat();
+        // 下面语句输出："cat eat..."
+        a2.cat();
+        /*
+        1. 编译的时候编译器只知道a2是Animal类型，在Animal里找得到cat方法没毛病，对Animal的eat进行绑定，此时叫做静态绑定。
+        2. 程序运行的时候，堆内存中真实的Java对象是Cat对象类型，所以cat()的行为是Cat对象发生的，因此运行的时候会自动调用Cat对象的eat()方法，这种在运行期的绑定叫动态绑定。
+        --编译期一种形态，运行的时候一种形态，因此得名多态。--
+        */
+        
+        a2.catchMouse();
+        // 编译报错，静态绑定失败。
+		// 解决办法：
+        /*
+          向下转型（downcasting）：父 ----> 子
+          两种类型具有继承关系
+          调用方法是子类特有
+          等同看作强制类型转换
+        */
+        Cat c2 = (Cat)a2;
+        c2.catchMouse();
+        
+    }
+}
+```
+
+```java
+Animal a = new Cat();
+Bird b = (Bird)a;
+
+/*
+编译没问题，运行报错 ClassCastException 。
+因为Bird类型和Animal类型具有继承关系，但是运行时堆中内存a实际是Cat对象，运行阶段就会出错，不能将Cat转换为Bird类型。
+*/
+```
+
+**怎么避免 ClassCastException 异常？**
+
+**instanceof 运算符语法规则：**
+
+- 结果一定是 true 或 false
+- (引用 instanceof 类型)
+- (a instanceof Cat)
+
+true: a 引用指向的对象是 Cat 类型
+
+false: a 引用指向的对象不是 Cat 类型
+
+> **做向下转型之前，先用 instanceof 进行判断**
+
+```java
+if(a instanceof Bird) {
+   Bird b = (Bird)a; 
+}
+```
+
+
+
+#### 总结
+
+![image-20240808161805016](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408081618170.png)
+
+#### 软件开发原则
+
+![image-20240808162315241](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408081623370.png)
+
+多态就符合 OCP 原则，多态面向抽象编程，解耦性强，扩展能力就强。
+
+
+
+### super关键字
+
+![image-20240808221905809](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408082219002.png)
+
+super关键字不是保存的地址啥的，只是保存当前对象中的父类型特征。
+
+![image-20240809105215489](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408091052701.png)
+
+#### super()方法
+
+```java
+public class A {
+    String name;
+    int age;
+    
+    public A(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+}
+```
+
+```java
+public class B extends A {
+    String address;
+    
+    public B(String name, int age, String address) {
+        // this.name = name;
+        // this.age = age;
+        // 通过子类构造方法调用父类的构造方法，这样调用不会用父类创建新的对象。
+        super(name, age)
+        this.address = address;
+    }
+}
+```
+
+- #### **构造方法会<span style="color:red;">默认在开头调用 super()</span>, 本质目的也是为了给继承的属性初始化，所以父类最好有缺省构造**
+
+- #### **this()  和 super() 不能共存，因为都必须在构造方法第一行。**
+
+
+
+### final 关键字
+
+![image-20240809224826827](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408092248049.png)
+
+- #### **final 修饰的实例变量本质在构造方法执行完之前必须手动附上值**
+
+- #### **final 修饰的变量是可以先不给值后面再赋值的，等于有一次机会**
+
+```java
+// 常量
+public static final double P = 3.1415926;
+
+// 引用
+class A {
+    
+}
+
+final A wangcai = new A();
+wangcai = new A();   // 报错
+```
+
+
+
+### 抽象类（abstract）
+
+![image-20240809231244041](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408092312213.png)
+
+- #### 非抽象类继承抽象类后，必须将抽象方法进行重写，或者在子类修饰符也加 abstract 进行抽象。
+
+- #### 抽象类无法实例化的，但是可以有构造方法提供给子类使用。
+
+
+
+### 接口（interface）
+
+#### 语法
+
+![image-20240810103318400](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408101033616.png)
+
+- ### **第4点只适合JDK8之前的版本**
+
+```java
+/*
+接口是完全抽象的，所以常量和抽象方法不需要加修饰符
+*/
+
+public static final int a = 1;
+int b = 1;
+
+/*--------------------------------------------------------------------------*/
+public abstract void m1();
+void m2();
+```
+
+> **默认方法**
+
+```java
+interface MyInterFace {
+    // 默认方法 default 修饰
+    default void MyDefault() {
+        
+    }
+}
+```
+
+- #### **默认方法并不需要强制在实现类里实现该方法**
+
+> **静态方法**
+
+- #### **JDK8之后允许写静态方法**
+
+```java
+interface MyInterFace {
+
+    static void staticMethod() {
+        System.out.println("...")
+    }
+}
+
+// 静态方法只能这样调用
+MyInterFace.staticMethod();
+```
+
+- #### **接口的实现类不能调用接口的静态方法**
+
+- #### **JDK9之后允许定义私有的实例方法（给默认方法服务）和静态方法（给静态方法服务），目的给本接口使用**
+
+#### 作用
+
+![image-20240810163703351](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408101637525.png)
+
+> **面向抽象编程，接口完全抽象，接口+多态编程能降低耦合度，提高代码的扩展能力**
+
+
+
+### 接口和抽象类的选择
+
+![image-20240810170316413](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408101703578.png)
+
+> **注意最后两点**
+
+- #### **实现类向接口类型转型正确来说不叫向下转型，因为是从具体实现向抽象转换，通常是进行向上转型，但是我们也可以这么向下强制转换，但要注意类型判断进行安全的强制转换。**
+
+
+
+### 统一建模语言（UML）
+
+![image-20240811004815997](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408110048227.png)
+
+
+
+> **类之间的关系**
+
+![image-20240811131832918](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408111318061.png)
+
+泛化 ==== 继承 
+
+实现 ==== implements
+
+![image-20240811132643475](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408111326545.png)
+
+关联 ==== a 里有 b
+
+![image-20240811133341190](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408111333250.png)
+
+> **+ 号代表 public  - 号代表 private**
+
+
+
+聚合关系：
+
+![image-20240811142128114](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408111421185.png)
+
+
+
+组合关系：
+
+![image-20240811142422726](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408111424790.png)
+
+
+
+依赖关系：
+
+
+
+![image-20240811142710678](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408111427739.png)
+
+
+
+### 访问控制权限
+
+![image-20240811142857863](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408111428949.png)
+
+**重点关注下缺省和 protected**
+
+不同包 ----> 缺省和protected 无法访问
+
+不同包但是继承了 ----> protected 可以访问
+
+
+
+### Object根类
+
+![image-20240811144142642](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408111441752.png)
+
+
+
+#### toString() 方法
+
+> **将 java 对象转换为其字符串表现形式**
+
+![image-20240811145744086](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408111457172.png)
+
+- **toString() 也可以进行重写。**
+
+
+
+> **System.out.println() 打印输出引用时，会自动调用引用的 toString() 方法。**
+
+![image-20240811150144625](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408111501706.png)
+
+![image-20240811150554959](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408111505019.png)
+
+
+
+上面的原因是源码导致的。
+
+
+
+#### equals() 方法
+
+> **判断两个对象是否相等，返回布尔类型**
+
+其源码：
+
+```java
+public boolean equals(Object obj) {
+    return (this == obj);
+}
+```
+
+**== 原则：比较变量中保存的值是否相等**
+
+![image-20240811160713665](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408111607753.png)
+
+
+
+- **String类型底层也是new 一个 String 创建字符串，所以字符串比较不能用 == ，因为此时比较的内存地址，肯定不同**
+- **String 类型里的 equals 在底层已经进行了重写，此时是将字符串的byte数组值进行挨个比较，相等就判断两个字符串相等，而不是默认去比较的内存地址。**
+
+- **另外，String() 也将 toString() 进行了重写，输出直接输出对应的字符串，而不是输出完整类名@十六进制数字**
+
+
+
+#### hashCode 和 finalize
+
+![image-20240811163813010](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408111638095.png)
+
+
+
+**hashCOde 将对象的内存地址转换为十进制整数返回**
+
+在Object中默认的实现：
+
+```java
+public native int hashCode();
+// native方法底层调用C++写的动态链接程序（xxx.dll）
+```
+
+
+
+finalize 在 JDK9+ 后过时
+
+![image-20240811170056541](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408111700642.png)
+
+该方法是java对象被回收时，GC回收器自动调用被回收对象的finalize方法，完成销毁前准备。
+
+Object 里的默认实现：
+
+```java
+protected void finalize() throws Throwable {}
+// 需要子类重写
+```
+
+```java
+// 建议启动垃圾回收期
+System.gc();
+```
+
+<img src="https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408111715607.png" alt="image-20240811171532535" style="zoom: 80%;" />
 
 
 
 
 
+#### clone
+
+> **对象的拷贝：浅拷贝、深拷贝**
+
+![image-20240811171923043](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408111719099.png)
+
+在本类中也能访问。
+
+参加克隆的对象必须实现 Cloneable 接口（标志接口），否则报错不支持克隆
+
+![image-20240811172926380](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408111729436.png)
+
+![image-20240811173050899](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408111730985.png)
 
 
 
+> **浅克隆（拷贝）**
+
+![image-20240811173236227](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408111732288.png)
+
+浅拷贝的对象如果属性里还有对象字段，那这个对象的是无法被拷贝的，对克隆的新对象里的该对象属性进行操作，原对象里对象属性也会变。
+
+![image-20240811223441285](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408112234391.png)
 
 
 
+> **深克隆（拷贝）**
+
+**克隆的时候除了该克隆对象被克隆外，该对象所关联的对象内存空间也复制一份。**
+
+步骤：
+
+- 重写clone方法
+
+​			将自己类中属性字段为引用的也克隆，this.getXXX.clone() 拿到。
+
+- 将关联引用也写成可克隆、重写clone()
+
+- 最后将克隆后的对象里面引用的字段通过setXXX方法将上面关联引用克隆下来的赋值过去
 
 
 
+### 内部类
+
+![image-20240811224542756](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408112245860.png)
 
 
 
+#### 静态内部类
+
+静态内部类等同静态变量
+
+```java
+public class OuterClass {
+    
+    private static int a = 1;
+    
+    private int b = 2;
+    
+    private static void m1() {};
+    private void m2() {};
+    
+    // 对于静态内部类来说，修饰符可以使用
+    public static class InnerClass {
+        public void m3() {
+            System.out.println(a);  // 能访问
+            System.out.println(b);  // 不能
+            m1();  // 能
+            m2();  // 不能
+        }
+    } 
+}
+```
+
+- ##### **静态内部类中，无法直接访问外部中实例数据**
+
+- **使用方法一样的，外部类名.内部类new对象即可**
 
 
 
+#### 实例内部类
+
+实例内部类等同实例变量
+
+```java
+public class OuterClass {
+    
+    private static int a = 1;
+    
+    private int b = 2;
+    
+    private static void m1() {};
+    private void m2() {};
+    
+    public class InnerClass {
+        public void m3() {
+            System.out.println(a);  // 能访问
+            System.out.println(b);  // 能
+            m1();  // 能
+            m2();  // 能
+        }
+    } 
+}
+```
+
+- **因为要使用InnerClass的前提是外部类new出对象来，所以实例相关能访问，静态更不用说**
+
+![image-20240811230707373](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408112307451.png)
 
 
 
+#### 局部内部类
+
+局部内部类等同于局部变量
+
+局部内部类能不能访问外部的实例相关取决于所在的局部方法修饰符
+
+- **如果局部内部类在实例方法里，那外部的静态和实例相关都能访问**
+- **如果局部内部类在静态方法里，那外部的静态相关能访问，但是实例相关不能访问**
+- **局部内部类不能使用修饰符**
+
+```java
+public class OuterClass {
+    
+    private static int a = 1;
+    private int b = 2;
+    private static void m1() {};
+    private void m2() {};
+    
+	public void x1() {
+        class InnerClass {
+            public void m3() {
+                System.out.println(a);  // 能访问
+                System.out.println(b);  // 能
+                m1();  // 能
+                m2();  // 能
+            	}
+    	}
+        InnerClass innerClass = new InnerClass();
+        innerClass.m3();
+    }
+    
+    public static void x2() {
+        class InnerClass {
+            public void m3() {
+                System.out.println(a);  // 能访问
+                System.out.println(b);  // 不能
+                m1();  // 能
+                m2();  // 不能
+            	}
+    	} 
+    }
+}
+```
+
+- **局部内部类访问该类所在方法的局部变量时，局部变量需要 fianl 修饰，但在 JDK8 开始不需要手动添加了。**
+
+
+
+#### 匿名内部类（重点）
+
+没有名字的类，只能使用一次。
+
+防止类爆炸
+
+```java
+public class Test {
+    public static void main(String[] args) {
+        computer computer = new computer();
+
+        computer.conn(new Usb() {
+            @Override
+            public void read() {
+                System.out.println("read");
+            }
+
+            @Override
+            public void write() {
+                System.out.println("write");
+            }
+        });
+    }
+}
+
+
+class computer {
+    public void conn(Usb usb) {
+        usb.read();
+        usb.write();
+    }
+}
+
+interface Usb {
+    void read();
+    void write();
+}
+```
 
 
 
