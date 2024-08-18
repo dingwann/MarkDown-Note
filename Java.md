@@ -8,7 +8,7 @@ JDK 里集成了 JVM
 
 JavaSE 为基础衍生了 JavaEE（企业级开发）、JavaME （嵌入式开发）
 
-Java的安装路径下bin目录存放其命令、lib存放其类库、lib/src.zip Java的源码
+Java的安装路径下bin目录存放其命令、lib存放其类库、lib/src.zip ----> Java的源码
 
 **javac ----> 编译             java.exe ----> 运行**
 
@@ -369,7 +369,7 @@ long b = 100;
 long c = 100L;   // 默认就是long类型，8字节。
 
 long e = 2147483647  // ok
-long e = 2147483648  // 整型溢出
+long e = 2147483648  // int整型溢出
 ```
 
 
@@ -459,9 +459,9 @@ double双精度，可以到15位小数
 **double 更加常用**
 
 ```java
-float a = 3.3;  
+// float a = 3.3;  
 // 编译报错，因为3.3默认为double类型
-// float a = 3.3F;
+float a = 3.3F;
 ```
 
 两种表示形式：
@@ -995,6 +995,8 @@ i = temp;
 if((num & 1) == 1) {
     // num是奇数
 }
+
+// 因为1的二进制最后一位是1，按位与的话只有都为1结果才为1，因为奇数的最后一位也为1，所以能判断。
 ```
 
 
@@ -1254,7 +1256,7 @@ public class test {
 // 如果方法执行结束时不返回任何数据给调用者写void，不能空着不写。
 ```
 
-当返回值类型不是void的时候，方法程序结束时必须用 return 值来完成数据的返回
+**当返回值类型不是void的时候，方法程序结束时必须用 return 值来完成数据的返回**
 
 ```java
 public static void m() {
@@ -1686,7 +1688,7 @@ public void setAge(int age) {}
 
 ```java
 public void setAge(int age) {
-    age = age;
+    // age = age;
     this.age = age;
 }
 // 这时候的前面个age应该指对象的属性，所以要加this进行区分
@@ -2171,7 +2173,7 @@ wangcai = new A();   // 报错
 
 ![image-20240810103318400](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408101033616.png)
 
-- ### **第4点只适合JDK8之前的版本**
+- ### **第4点的限制只适合JDK8之前的版本**
 
 ```java
 /*
@@ -2217,7 +2219,7 @@ MyInterFace.staticMethod();
 
 - #### **接口的实现类不能调用接口的静态方法**
 
-- #### **JDK9之后允许定义私有的实例方法（给默认方法服务）和静态方法（给静态方法服务），目的给本接口使用**
+- #### **JDK9之后允许定义私有的实例方法（给默认方法服务）和私有的静态方法（给静态方法服务），目的给本接口使用**
 
 #### 作用
 
@@ -2233,7 +2235,7 @@ MyInterFace.staticMethod();
 
 > **注意最后两点**
 
-- #### **实现类向接口类型转型正确来说不叫向下转型，因为是从具体实现向抽象转换，通常是进行向上转型，但是我们也可以这么向下强制转换，但要注意类型判断进行安全的强制转换。**
+- #### **实现类向接口类型转型正确来说不叫向下转型，因为是从具体实现向抽象转换，通常是进行向上的自动转型，但是我们也可以这么向下强制转换，但要注意类型判断进行安全的强制转换。**
 
 
 
@@ -2367,7 +2369,7 @@ finalize 在 JDK9+ 后过时
 
 ![image-20240811170056541](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408111700642.png)
 
-该方法是java对象被回收时，GC回收器自动调用被回收对象的finalize方法，完成销毁前准备。
+**该方法是java对象被回收时，GC回收器自动调用被回收对象的finalize方法，完成销毁前准备。**
 
 Object 里的默认实现：
 
@@ -2377,7 +2379,7 @@ protected void finalize() throws Throwable {}
 ```
 
 ```java
-// 建议启动垃圾回收期
+// 建议启动垃圾回收器
 System.gc();
 ```
 
@@ -2584,6 +2586,455 @@ interface Usb {
     void write();
 }
 ```
+
+
+
+
+
+## 数组
+
+### 数组概述
+
+![image-20240816162801610](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408161628739.png)
+
+
+
+![image-20240816162153615](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408161621719.png)
+
+![image-20240816163311916](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408161633034.png)
+
+- 数组中类型相同，占用内存相同，有下标，查找快，查找时间都一样，时间复杂度O(1)。
+
+
+
+### 一维数组
+
+![image-20240816234132475](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408162341577.png)
+
+> **静态初始化一维数组**
+
+```java
+/**
+* 1. 数据类型[] 变量名 = new 数据类型[]{};
+* 2. 数据类型[] 变量名 = {};
+*/
+
+int[] arr = new int[]{};
+int[] arr2 = {};
+
+// C/C++风格
+int arr[] = new int[]{};
+```
+
+
+
+- **访问**
+
+```java
+public class ArrTest {
+	public static void main(String[] args) {
+        int[] nums = {10, 20, 30, 40, 50};
+        
+        // 读
+        System.out.println(nums[0]);
+        
+        // 改
+        nums[0] = 100;
+        System.out.println(nums[0]);
+        
+    }
+}
+
+// 数组长度
+nums.length
+```
+
+
+
+- **for each(增强for循环)**
+
+```java
+/*
+语法:
+for(数组中数据类型 变量名 : 数组名) {
+
+}
+变量名代表数组中每个元素
+*/
+
+int[] arr = {11, 22, 33, 44}
+
+for(int num : arr) {
+    System.out.println(num);
+}
+```
+
+优点：代码简洁，可读性强
+
+缺点：没有下标
+
+
+
+> **动态初始化一维数组**
+
+- **创建数组时，不知道具体存哪些元素时**
+
+- **初始化完成后，数组长度确定，数据中存储的元素将采用默认值**
+
+```java
+数据类型[] 数组名 = new 数据类型[长度];
+
+int[] nums = new int[4];
+```
+
+
+
+![image-20240817125258995](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408171252097.png)
+
+数组中存的不是对象本身，存的是引用的内存地址。
+
+![image-20240817131136403](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408171311539.png)
+
+![image-20240817131230199](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408171312281.png)
+
+
+
+### 获取数组中的最大值
+
+```java
+public class ArrTest {
+    public static void mian(String[] args) {
+        int[] arr = {1,23,45,67,44,33,566};
+        int Max = searchMax(arr);
+        System.out.println(Max);
+    }
+    
+    public static int searchMax(int[] arr) {
+        // 假设第一个最大
+        int max = arr[0];
+        for(int i = 0, i < arr.length, i++) {
+            if(arr[i] > max) {
+                max = arr[i];
+            }
+        }
+        return max;
+    }
+}
+```
+
+- **找最大值的小标**
+
+```java
+public class ArrTest {
+    public static void mian(String[] args) {
+        int[] arr = {1,23,45,67,44,33,566};
+        int MaxIndex = searchMaxIndex(arr);
+        System.out.println("最大值下标：" + MaxIndex);
+    }
+    
+    public static int searchMaxIndex(int[] arr) {
+        int maxIndex = 0;
+        for(int i = 0, i < arr.length, i++) {
+            if(arr[i] > arr[maxIndex]) {
+                maxIndex = i;
+            }
+        }
+        return maxIndex;
+    }
+
+}
+```
+
+### 数组反转
+
+```java
+// 创建新数组进行反转
+
+public calss ReverseTest {
+    public static void main(String[] args) {
+        int[] arr = {1,2,3,4,5,6,7,8,9};
+        reverse(arr);
+        System.out.println(arr);
+    }
+    
+    
+    public static void reverse(int[] arr) {
+        int[] newArr = new int[9];
+        for(int i = 0; int < arr.length; i ++) {
+            newArr[i] = arr[arr.length - 1 - i]
+        }
+        // 下面这样反转不改变原数组的内存地址，不考虑的话可以直接arr = newArr;
+        for(int i = 0; i < newArr.length; i++) {
+            arr[i] = newArr[i]
+        }
+    }
+}
+
+```
+
+- 首尾交换进行反转
+
+```java
+// 无论数组中的数据是偶数还是奇数，循环次数都是数组长度的一半
+// {1,2,3,4} ----> 1-4 2-3     2次
+// {1,2,3,4,5} ----> 1-5 2-4 3不需要   2次
+
+
+public class ReverseTest {
+	public static void main(String[] args) {
+        int[] arr = {1,2,3,4,5,6,7,8,9};
+        reverse(arr);
+        System.out.println(arr);
+    }
+    
+    public static void reverse(int[] arr) {
+        for(int i = 0; i < arr.length / 2; i++) {
+            int temp = arr[i];
+            arr[i] = arr[arr.length - 1 - i];
+            arr[arr.length - 1 - i] = temp;
+        }
+    }
+}
+```
+
+
+
+> **main方法的形参args**
+
+- **接收命令行参数**
+
+JVM负责调用main方法并且准备String数组
+
+![image-20240817175655757](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408171756935.png)
+
+
+
+> **可变长度参数**
+
+```java
+// 语法： 数据类型(包括引用数据类型)...
+
+public static m1(int... nums) {
+    
+}
+```
+
+- **可变长度参数使用了，那形参位置只能有它**
+- **可变长度参数可当数组来用**
+
+
+
+### 一维数组扩容
+
+![image-20240817181941476](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408171819593.png)
+
+```java
+// 该方法是native方法，效率可以
+package Arr;
+
+public class ArrTest {
+    public static void main(String[] args) {
+
+        int[] arr = {11,23,5,52,7677,88,44,25};
+        int[] newArr = new int[arr.length * 2];
+
+        System.arraycopy(arr, 0, newArr, 0, arr.length);
+
+        for(int nums : newArr) {
+            System.out.print(nums + " ");
+        }
+        // 11 23 5 52 7677 88 44 25 0 0 0 0 0 0 0 0
+    }
+}
+
+```
+
+
+
+### 二维数组
+
+![image-20240817183607122](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408171836250.png)
+
+
+
+> **静态初始化**
+
+```java
+package Arr;
+
+public class ArrTest {
+    public static void main(String[] args) {
+        // 完整格式
+        int[][] arr = new int[][]{{}, {}, {}};
+
+        // 简化
+        int[][] arr2 = {{}, {}, {}};
+    }
+}
+
+```
+
+- **查找元素**
+
+```java
+package Arr;
+
+public class ArrTest {
+    public static void main(String[] args) {
+        // 完整格式
+        int[][] arr = new int[][]{{11,22,33}, {1,2,3,4}, {111,222,333}};
+		
+        // 第一个数组中的第一位元素
+        int a = arr[0][0]
+        
+    }
+}
+```
+
+> **动态初始化**
+
+```java
+package Arr;
+
+public class ArrTest {
+    public static void main(String[] args) {
+        // 等长，3个一维数组，每个数组长度为4。
+        int[][] arr = new int[3][4];
+        
+        // 遍历
+        for(int i = 0; i < arr.length; i++) {
+            for(int j = 0; j < arr[i].length; j++) {
+                System.out.print(arr[i][j]  + " ");
+            }
+            System.out.println();
+        }
+        
+        // 不等长
+        int[][] arr2 = new int[3][];
+        nums[0] = new int[]{1,2,3,4,5,6,7,8,9};
+        nums[1] = new int[]{11,22,33,44};
+        nums[2] = new int[]{100,200,300,400,500,600,700,800,900,1000};
+    }
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
