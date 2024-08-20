@@ -2920,91 +2920,388 @@ public class ArrTest {
 
 
 
+## Junit单元测试
 
+![image-20240819123758134](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408191237326.png)
 
 
 
+## 数据结构与算法（简易版）
 
+![image-20240819133207241](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408191332435.png)
 
+### 算法
 
+![image-20240819162138021](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408191621266.png)
 
+> **时间复杂度**
 
+![image-20240819162521917](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408191625052.png)
 
+> **下面按消耗时间效率进行排序的**
 
+![image-20240819170952335](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408191709489.png)
 
+![image-20240819171013691](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408191710777.png)
 
+![image-20240819171357914](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408191713992.png)
 
+![image-20240819171507354](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408191715444.png)
 
+![image-20240819171557245](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408191715338.png)
 
+![image-20240819171901463](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408191719534.png)
 
+![image-20240819172204348](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408191722459.png)
 
+### 冒泡排序
 
+```java
+import java.util.Arrays;
 
+public class Test {
+    public static void main(String[] args) {
+        int[] arr = {3, 2, 4, 8, 10, 1};
 
+        for (int i = 0; i < arr.length - 1; i++) {
+            for (int j = 0; j < arr.length - 1 - i; j++) {
+                if(arr[j] > arr[j + 1]) {
+                        int temp = arr[j];
+                        arr[j] = arr[j + 1];
+                        arr[j + 1] = temp;
+                };
+            }
+        }
+        System.out.println(Arrays.toString(arr));
+    }
+}
 
+```
 
+优化版：
 
+```java
+package Suanfa;
 
+import java.util.Arrays;
 
+public class Test {
+    public static void main(String[] args) {
+        int[] arr = {3, 2, 4, 8, 10, 1};
 
+        for (int i = arr.length - 1; i >= 0; i--) {
+            boolean flag = true;
+            for (int j = 0; j < i; j++) {
+                if(arr[j] > arr[j + 1]) {
+                        int temp = arr[j];
+                        arr[j] = arr[j + 1];
+                        arr[j + 1] = temp;
+                    	flag = false;
+                };
+            }
+            if(flag) break;
+        }
+        
+        System.out.println(Arrays.toString(arr));
+    }
+}
 
+```
 
 
 
+### 选择排序
 
+- **因为冒泡交换次数太频繁，不常用，因此这种算法更加高效**
 
+```java
+import java.util.Arrays;
 
+/**
+ * 选择排序：
+ * 找出参与比较中最小的元素和其中最左边的元素进行比较然后交换位置
+ *
+ * 原理：
+ * [2,5,8,9,3,1]
+ *
+ * 第一次参与比较：2, 5, 8, 9, 3, 1
+ * 比较完成后：1, 5, 8, 9, 3, 2
+ *
+ * 第二次参与比较：5, 8, 9, 3, 2
+ * 比较完成后：1, 2, 8, 9, 3, 5
+ *
+ * ...类推
+ * */
 
+public class Test {
+    public static void main(String[] args) {
+        int[] arr = {3, 2, 4, 8, 10, 1};
 
+        for (int i = 0; i < arr.length - 1; i++) {
+            for (int j = i + 1; j < arr.length; j++) {
+                if(arr[j] < arr[i]) {
+                    int temp = arr[i];
+                    arr[i] = arr[j];
+                    arr[j] = temp;
+                }
+            }
+        }
 
+        System.out.println(Arrays.toString(arr));
+    }
+}
 
+```
 
 
 
+### 查找算法
 
+![image-20240820113338245](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408201133439.png)
 
+> **二分法（折半）**
 
+```java
+package Suanfa;
 
+import java.util.Arrays;
 
 
+public class Test {
+    public static void main(String[] args) {
+        int[] arr = {1,5,8,27,33,66,90,222,499,557};
 
+        int targetIndex = serachIndex(arr, 222);
 
+        System.out.println(targetIndex);
+    }
 
+    public static int serachIndex(int[] arr, int target) {
+        int start = 0, end = arr.length - 1;
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+            if (arr[mid] == target) {
+                return mid;
+            }else if (arr[mid] > target) {
+                end = mid - 1;
+            }else {
+                start = mid + 1;
+            }
+        }
+        return -1;
+    }
+}
 
+```
 
 
 
+## Arrays 工具类
 
+![image-20240820115531644](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408201155793.png)
 
+> **第四点自定义类型做比较，这个自定义类型必须实现 comparable 接口，并且重写compareTo方法编写比较规则**
 
+因为你调equals进行比较的引用类型的时候，底层是将其强制转换为comparable类型
 
+![image-20240820150041150](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408201500380.png)
 
 
 
+## 异常
 
+![image-20240820151452921](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408201514048.png)
 
+![image-20240820152832004](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408201528164.png)
 
+> **概念版**
 
+![image-20240820154324692](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408201543806.png)
 
+**程序员编程导致的错误一般在RuntimeException里，外在条件导致的错误在Exception的其余部分**
 
 
 
+- **异常的发生需要两个阶段**
+  	1. 创建异常对象
+  	1. 让异常发生（手动抛出异常）
 
+```java
+public class ExceptionTest {
+	public static main(String[] args) {
+        // NullPointerException e = new NullPointerException();
+        // throw e;
+        
+        throw new NullPointerException(); 
+    }
+}
+```
 
 
 
+### 自定义异常
 
+![image-20240820155652153](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408201556288.png)
 
+### 异常处理
 
+- **Java 中继承Exception的自定义异常在使用的时候编译器会报错，因为Exception属于编译时异常，解决如下：**
+- **两种方法一般结合使用的**
 
+```java
+// 1.在方法定义的后面使用throws关键字进行异常的声明,目的是当当前方法出现异常时，将出现的异常抛给调用者进行处理
 
+/**
+* throws在方法体里有啥异常抛啥异常，向上找有调用者也得进行异常处理
+* throws可以抛给异常的父类型异常处理，比如下面的抛给Exception
+*/
+public void m() throws IOException{
+    throw new IOException();
+}
 
 
 
 
+// 2.对new的异常进行捕捉处理
 
+/**
+    try {
+		// 这里写需要尝试执行的程序，这里的程序可能出现异常
+		// try里的代码当出现异常时，出现异常的代码行以后的不再执行
+    }catch(异常类型1 变量名) {
+		...;
+    }catch(异常类型2 变量名) {
+    	...;
+    }...进行捕捉异常
 
+* catch可以写多个，但是遵循自上到下，从小到大
+*/
+public void m1() {
+    try {
+        ...;
+    }catch(IOException e) {
+        ...;
+    }catch(Exception e) {
+        ...;
+    }
+}
 
+```
+
+- **Java7 + 的 try catch 新特性**
+
+```java
+public void m1() {
+    try {
+        ...;
+    }catch(IOException | Exception e) {
+        ...;
+    }
+}
+```
+
+![image-20240820174045639](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408201740750.png)
+
+```java
+public class ExceptionTest {
+    public static void main(String[] args) {
+        try {
+            m1(10);
+        }catch(xxx e) {
+            String msg = e.getMessage();
+            System.out.println(msg);
+            // 得到"年龄不合法！"
+        }
+    }
+    
+    public void m1(int age) throws xxx {
+        if(age < 18) {
+            throw new xxx("年龄不合法！");
+        }
+    }
+}
+```
+
+
+
+### finally 语句块
+
+![image-20240820180817387](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408201808534.png)
+
+- **finally 一定会执行，哪怕在try中执行了 return; 结束了方法**
+
+- **但是如果在try中执行System.exit();结束了JVM，这种情况finally不执行**
+
+```java
+public class ExceptionTest {
+    public static void main(String[] args) {
+        int res = m1();    // 100
+    }
+    
+    public static int m1(){
+        int i = 100;
+        try {
+            return i;
+        }finally {
+            i++;
+        }
+    }
+}
+```
+
+
+
+### 方法覆盖与异常
+
+- **方法覆盖后抛出的异常只能变少！**
+
+```java
+public class ExceptionTest {
+    public static void main(String[] args) {
+        
+    }
+}
+
+class Pet {
+    public void run() throws xxx1, xxx2{
+        
+    }
+}
+
+class Dog extends Pet {
+    // 正常写法
+    @Override
+    public void run() throws xxx1, xxx2{
+        System.out.println("嘻嘻")
+    }
+    
+    @Override
+    public void run() throws xxx1{
+        System.out.println("嘻嘻")
+    }
+    
+    @Override
+    public void run(){
+        System.out.println("嘻嘻")
+    }
+    
+    // 下面不行
+    @Override
+    public void run() throws xxx1, xxx2, xxx3{
+        System.out.println("嘻嘻")
+    }
+}
+```
+
+
+
+
+
+## 常用类
+
+### String 类
+
+![image-20240820203315183](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408202033344.png)
 
 
 
