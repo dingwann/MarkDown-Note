@@ -2924,6 +2924,8 @@ public class ArrTest {
 
 ![image-20240819123758134](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408191237326.png)
 
+![image-20240820225715235](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408202257297.png)
+
 
 
 ## 数据结构与算法（简易版）
@@ -3102,7 +3104,7 @@ public class Test {
 
 > **第四点自定义类型做比较，这个自定义类型必须实现 comparable 接口，并且重写compareTo方法编写比较规则**
 
-因为你调equals进行比较的引用类型的时候，底层是将其强制转换为comparable类型
+- **因为你调equals进行比较的引用类型的时候，底层是将其转型为comparable类型然后调用其compareTo方法，因为是多态机制，所以调用的实际是真实对象重写的compareTo()方法**
 
 ![image-20240820150041150](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408201500380.png)
 
@@ -3302,6 +3304,672 @@ class Dog extends Pet {
 ### String 类
 
 ![image-20240820203315183](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408202033344.png)
+
+![image-20240820212010733](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408202120074.png)
+
+```java
+String x = "aaa" + "bbb";
+String y = "aaabbb";
+System.out.println(x == b);   // true;
+```
+
+- 将堆中字符串对象放到字符串常量池中
+
+```java
+String var = 变量名.intern();
+```
+
+
+
+> **String 类的常用构造方法**
+
+![image-20240820213212223](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408202132370.png)
+
+
+
+> **String 类的常用方法**
+
+![image-20240820225112364](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408202251667.png)
+
+------
+
+![image-20240821213204778](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408212132933.png)
+
+------
+
+![image-20240821235914047](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408212359173.png)
+
+![image-20240822004949991](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408220049070.png)
+
+- **最长字符串的长度**
+
+![image-20240822155957979](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408221559087.png)
+
+
+
+### StringBuffer 和 StringBuilder
+
+![image-20240822160128720](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408221601813.png)
+
+> **底层源码**
+
+两者都继承了 **AbstractStringBuilder**
+
+![image-20240822161251192](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408221612277.png)
+
+构造方法：
+
+![image-20240822163811897](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408221638962.png)
+
+- **常用方法**
+
+API文档有
+
+![image-20240822163950704](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408221639797.png)
+
+![image-20240822164312694](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408221643785.png)
+
+### String 的效率问题
+
+![image-20240822174703804](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408221747989.png)
+
+### 包装类
+
+![image-20240822175241127](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408221752211.png)
+
+![image-20240822180001726](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408221800855.png)
+
+- **Boolean和Character也有拆箱方法的**
+
+  
+
+> **把包装类给转回基本数据类型的过程 ----> 拆箱**
+
+```java
+// 用Integer做代表学习
+
+System.out.println("int最大值：" + Integer.MAX_VALUE);
+System.out.println("int最小值：" + Integer.MIN_VALUE);
+```
+
+![image-20240822180840586](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408221808656.png)
+
+> **将基本数据类型构造成包装类的过程 ----> 装箱（手动的很少用了）**
+
+![image-20240822180938184](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408221809266.png)
+
+> **Integer 常用方法**
+
+![image-20240822181812309](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408221818486.png)
+
+![image-20240822183220172](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408221832272.png)
+
+```java
+@Test
+public void testLeixing() {
+    // String --> int
+    String s = "100";
+    int i = Integer.parseInt(s);
+
+    // int --> String
+    int j = 10;
+    String a = Integer.toString(j);
+
+    // String --> Integer
+    String s2 = "1212";
+    Integer i1 = Integer.valueOf(s2);
+
+    // Integer --> String
+    Integer i2 = Integer.valueOf(900);
+    String s3 = Integer.toString(i2);
+
+    // int --> Integer
+    int i4 = 999;
+    Integer i3 = Integer.valueOf(i4);
+
+    // Integer --> int
+    Integer i5 = Integer.valueOf(222);
+    int iii = i5.intValue();
+}
+```
+
+
+
+### 自动装箱与拆箱
+
+![image-20240822185142029](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408221851280.png)
+
+- **自动装箱与拆箱是编译阶段的功能**
+
+- **提高编程效率的机制**
+
+```java
+// 手动的装箱与拆箱
+Integer i = Integer.valueOf(10);
+int x = i.intValue();
+
+// auto boxing 和 auto unboxing
+Integer j = 10;
+int y = j;
+```
+
+
+
+### 整数型常量池问题
+
+```java
+public class IntegerTest {
+    public static void main(String[] args) {
+        Integer x = 10000;
+        Integer y = 10000;
+        System.out.println(x == y);  // false
+        
+        Integer a = 127;
+        Integer b = 127;
+        System.out.println(a == b);  // true
+        
+        Integer a1 = 128;
+        Integer b1 = 128;
+        System.out.println(a1 == b1);  // false
+    }
+}
+```
+
+**原因：**
+
+**[-128 ~ 127] 有256个 Integer 对象在内存里提前new好了放在一个数组里（Integer[] integerCache），叫整数型常量池**
+
+**因为这些数字太常用了，提前new好提高效率**
+
+> **私有的静态内部类**
+
+![image-20240822191603032](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408221916268.png)
+
+
+
+### 大数字
+
+![image-20240822191721945](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408221917087.png)
+
+```java
+BigInteger num = new BigInteger("9999999999999999999");
+System.out.println(num);
+```
+
+![image-20240822215432913](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408222154189.png)
+
+![image-20240822215839797](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408222158920.png)
+
+```java
+    @Test
+    public void testNumFormat() {
+        // 创建数字格式化对象
+        DecimalFormat decimalFormat = new DecimalFormat("###,###.##");
+        DecimalFormat decimalFormat2 = new DecimalFormat("###,###.0000");
+
+        // 格式化
+        String format = decimalFormat.format(12345678.123);
+        String format1 = decimalFormat2.format(12345678.123);
+
+        System.out.println(format); // 12,345,678.12
+        System.out.println(format1); // 12,345,678.1230
+    }
+```
+
+
+
+### 日期API
+
+![image-20240822220448801](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408222204016.png)
+
+![image-20240822224703152](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408222247354.png)
+
+```java
+@Test
+public void testDate() {
+    // 当前时间
+    Date date = new Date();
+    System.out.println(date);  // Thu Aug 22 22:21:26 CST 2024
+
+    // 传入毫秒计算从1970-1-1 00:00:00到现在的时间(东八区，所以成了00:00:00 + 08:00:00)
+    Date date1 = new Date(3000);
+    System.out.println(date1);  // Thu Jan 01 08:00:03 CST 1970
+}
+```
+
+```java
+@Test
+public void testFormatDate() throws ParseException {
+    // java.util.Date --> java.lang.String
+    // 获取当前时间
+    Date date = new Date();
+
+    // 格式化
+    // DateFormat是SimpleDateFormat的父类
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS");
+    String format = simpleDateFormat.format(date);
+
+    System.out.println(format);  // 2024-08-22 22:32:26 126
+
+    // java.lang.String --> java.util.Date
+    String strDate = "2008-01-23 12:22:55 111";
+
+    Date parse = simpleDateFormat.parse(strDate);
+    System.out.println(parse);  // Wed Jan 23 12:22:55 CST 2008
+}
+```
+
+> **Java8+ 新的日期API**
+
+![image-20240822231508422](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408222315614.png)
+
+- **都在 java.time 下了**
+
+```java
+@Test
+public void testNewDateAPI() {
+    // 获取当前时间，精确到纳秒
+    LocalDateTime now = LocalDateTime.now();
+    System.out.println(now);
+    // 获取指定时间
+    LocalDateTime localDateTime = LocalDateTime.of(2003, 01, 23, 12, 00, 01);
+    System.out.println(localDateTime);  // 2003-01-23T12:00:01
+    // 给日期进行加操作
+    LocalDateTime localDateTime1 = localDateTime.plusYears(1);
+    System.out.println(localDateTime1);  // 2004-01-23T12:00:01
+    // 给日期进行减操作,支持链式调用
+    LocalDateTime localDateTime2 = localDateTime1.minusDays(1).minusHours(1);
+    System.out.println(localDateTime2);  // 2004-01-22T11:00:01
+}
+```
+
+![image-20240822232822971](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408222328104.png)
+
+```java
+@Test
+public void testDate1() {
+    // 时间戳
+    long l = System.currentTimeMillis();
+    System.out.println("时间戳：" + l);  // 1724340846059
+    Date date = new Date(l);
+    System.out.println(date);  // Thu Aug 22 23:31:52 CST 2024
+
+    // Java8 新API
+    Instant now = Instant.now();  // 系统当前时间，基于UTC（全球标准时间）
+    long epochMilli = now.toEpochMilli();
+    System.out.println("时间戳：" + epochMilli);  // 1724340846081
+    System.out.println(now);  // 2024-08-22T15:31:52.633435100Z
+}
+```
+
+![image-20240822233526191](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408222335313.png)
+
+![image-20240822233847225](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408222338435.png)
+
+<img src="https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408222340551.png" alt="image-20240822234058413" style="zoom: 67%;" />
+
+![image-20240822234202092](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408222342292.png)
+
+------
+
+![image-20240822234443551](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408222344744.png)
+
+
+
+### 数学类 Math
+
+![image-20240822234900637](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408222349829.png)
+
+
+
+### System 类
+
+![image-20240823155835939](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408231558058.png)
+
+
+
+## 枚举
+
+![image-20240822235841002](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408222358175.png)
+
+![image-20240823150212231](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408231502454.png)
+
+> **枚举实现接口**
+
+```java
+public interface Eatable {
+    public void eat();
+}
+```
+
+```java
+public enum Season implements Eatable{
+    SPRING("春季", "x"),
+    SUMMER("夏季", "x"),
+    AUTUMN("秋季", "x"),
+    WINTER("冬季", "x");
+    // 另外一种实现接口方式
+    WINTER("冬季", "x") {
+        @Override
+        public void eat() {
+            ...
+        }
+    };
+    
+    Season(String name, String desc) {
+        this.name = name;
+        this.desc = desc;
+    }
+    
+    @Override
+    public void eat() {
+        ...
+    }
+}
+```
+
+
+
+## 随机数生成器Random
+
+![image-20240823152354935](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408231523021.png)
+
+```java
+```
+
+
+
+## UUID
+
+![image-20240824125120745](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408241251944.png)
+
+```java
+UUID uuid = UUID.randomUUID();   // 32位
+```
+
+
+
+## 集合
+
+![image-20240824142436377](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408241424489.png)
+
+
+
+### Collection
+
+![image-20240824144231987](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408241442147.png)
+
+集合就是容器，存储的是引用地址，有collection：存储单个元素和map：以键值对存储元素两种。
+
+![image-20240824195941170](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408241959247.png)
+
+
+
+![image-20240824224140787](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408242241888.png)
+
+- **contains方法底层调用了重写的equal方法进行比较值，而不是Object根类的比较内存地址。**
+
+- **remove方法底层调用了重写的equal方法进行比较值，而不是Object根类的比较内存地址。**
+
+![image-20240824230411600](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408242304683.png)
+
+```java
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+
+public class Test {
+    public static void main(String[] args) {
+        Collection c = new ArrayList();
+
+        c.add(100);
+        c.add("wangcai");
+        c.add(new Object());
+        
+        Iterator iterator = c.iterator();  // 拿到当前集合的迭代器对象
+        while (iterator.hasNext()){   // hasNext()判断当前是否存在元素
+            System.out.println(iterator.next());  // next()将当前元素返回并将光标移向下一位
+        }
+
+    }
+}
+
+```
+
+![image-20240825132719145](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408251327357.png)
+
+
+
+![image-20240825135700461](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408251357558.png)
+
+
+
+### 泛型
+
+![image-20240825141419545](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408251414656.png)
+
+![image-20240825153412107](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408251534270.png)
+
+- 自定义泛型，可以定义多个
+
+```java
+// 语法
+// class 类名<泛型1, 泛型2...>{}
+
+public class Ttest<T, A> {
+    private T name;
+    private A age;
+
+    public Ttest(T name, A age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public T getName() {
+        return name;
+    }
+
+    public void setName(T name) {
+        this.name = name;
+    }
+
+    public A getAge() {
+        return age;
+    }
+
+    public void setAge(A age) {
+        this.age = age;
+    }
+}
+
+```
+
+![image-20240825155232331](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408251552438.png)
+
+> **为什么静态方法不能用类上定义的泛型？因为类上定义的泛型我们在new对象时会指定泛型的类型，而静态方法不用new对象无法指定，那定义的泛型就没有意义。**
+
+- **在静态方法上定义泛型**
+
+```java
+// 需在静态方法的返回值前面定义好泛型
+
+public static <T> void m(T type) {
+    ...
+}
+```
+
+- **在接口上定义泛型**
+
+```java
+public interface i<T> {
+    
+}
+```
+
+![image-20240825161630870](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408251616975.png)
+
+
+
+### 集合的并发修改异常
+
+![image-20240825164159165](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408251641263.png)
+
+集合的remove会出错，迭代器的不会
+
+![image-20240825164549828](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408251645952.png)
+
+
+
+### List接口
+
+![image-20240825214059849](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408252141096.png)
+
+![image-20240825215457823](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408252154943.png)
+
+- **remove和set方法，调用了previous()也行的。**
+
+![image-20240825233548090](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408252335211.png)
+
+<img src="https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408260000611.png" alt="image-20240826000000532"  />
+
+<img src="https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408252359166.png" alt="image-20240825235944059"  />
+
+> **匿名内部类**
+
+```java
+new 接口名() {
+    @Override
+    ...
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 正则表达式
+
+![image-20240822003806770](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408220038860.png)
+
+### 常见符号
+
+![image-20240822003844504](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408220038581.png)
+
+![image-20240822004411833](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408220044929.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
