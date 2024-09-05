@@ -1077,6 +1077,8 @@ if() xxx;
 
 **字符串比较不能用 == ，必须手动调用equals方法进行比较**
 
+**因为==比较的是对象的值，字符串本质是String，自动装箱的因为String重写了equal方法所以没问题。new出来的话就会造成其内存地址不一样而造成误判**
+
 ```java
 String name = "wangcai"
 if(name.equals("admin")) {
@@ -1560,11 +1562,11 @@ public class StudentTest {
         s1.age = 18;
         s1.gender = true;
         
-        Study s2 = new Student();
+        Student s2 = new Student();
     }
 }
 // s1和s2是引用，保存的对象的内存地址
-// 将图里的Study改为StudentTest
+// 将图里的Study改为Student
 ```
 
 ![image-20240727170349219](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202407271703435.png)
@@ -1708,7 +1710,7 @@ public void setAge(int age) {
 
 注意就是static方法不能调实例方法也不能用this，因为static方法是不需要new出对象的，所以方法并没有存this。
 
-
+ 
 
 **构造代码块**
 
@@ -1796,10 +1798,6 @@ public static void main(String[] args) {
 ```java
 static {
     xxxxxxxxx;
-}
-
-public static void main(String[] args) {
-    xxxxxx;
 }
 ```
 
@@ -2199,7 +2197,9 @@ interface MyInterFace {
 }
 ```
 
-- #### **默认方法并不需要强制在实现类里实现该方法**
+- #### **默认方法并不需要强制在实现类里实现该方法，默认继承实现**
+
+![image-20240827180329748](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408271803839.png)
 
 > **静态方法**
 
@@ -2221,7 +2221,15 @@ MyInterFace.staticMethod();
 
 - #### **JDK9之后允许定义私有的实例方法（给默认方法服务）和私有的静态方法（给静态方法服务），目的给本接口使用**
 
-#### 作用
+![image-20240827180349979](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408271803074.png)
+
+> **实例方法**
+
+![image-20240827180426324](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408271804399.png)
+
+
+
+
 
 ![image-20240810163703351](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408101637525.png)
 
@@ -2319,7 +2327,7 @@ MyInterFace.staticMethod();
 
 
 
-上面的原因是源码导致的。
+**上面的原因是源码导致的，因为println会将其传入的引用转换为String对象，如果为空就返回null去转换，然后调用其toString方法。**
 
 
 
@@ -2399,6 +2407,10 @@ System.gc();
 
 参加克隆的对象必须实现 Cloneable 接口（标志接口），否则报错不支持克隆
 
+![image-20240827185808410](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408271858538.png)
+
+------
+
 ![image-20240811172926380](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408111729436.png)
 
 ![image-20240811173050899](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408111730985.png)
@@ -2421,13 +2433,13 @@ System.gc();
 
 步骤：
 
-- 重写clone方法
+- 将关联引用也写成可克隆、重写其clone()
 
-​			将自己类中属性字段为引用的也克隆，this.getXXX.clone() 拿到。
+- 重写类中clone方法
 
-- 将关联引用也写成可克隆、重写clone()
+​			将自己类中属性字段为引用的也克隆下来，this.getXXX.clone() 拿到其对象地址。
 
-- 最后将克隆后的对象里面引用的字段通过setXXX方法将上面关联引用克隆下来的赋值过去
+- 最后将克隆后的对象里面引用的字段通过setXXX方法将上面关联引用克隆下来的赋值过去再返回即可
 
 
 
@@ -2550,7 +2562,7 @@ public class OuterClass {
 
 #### 匿名内部类（重点）
 
-没有名字的类，只能使用一次。
+没有名字的类，**只能使用一次。**
 
 防止类爆炸
 
@@ -2885,7 +2897,7 @@ public class ArrTest {
         int[][] arr = new int[][]{{11,22,33}, {1,2,3,4}, {111,222,333}};
 		
         // 第一个数组中的第一位元素
-        int a = arr[0][0]
+        int a = arr[0][0]   // 11
         
     }
 }
@@ -2911,9 +2923,9 @@ public class ArrTest {
         
         // 不等长
         int[][] arr2 = new int[3][];
-        nums[0] = new int[]{1,2,3,4,5,6,7,8,9};
-        nums[1] = new int[]{11,22,33,44};
-        nums[2] = new int[]{100,200,300,400,500,600,700,800,900,1000};
+        arr2[0] = new int[]{1,2,3,4,5,6,7,8,9};
+        arr2[1] = new int[]{11,22,33,44};
+        arr2[2] = new int[]{100,200,300,400,500,600,700,800,900,1000};
     }
 }
 ```
@@ -3656,6 +3668,9 @@ public enum Season implements Eatable{
         }
     };
     
+    private String name;
+    private String desc;
+    
     Season(String name, String desc) {
         this.name = name;
         this.desc = desc;
@@ -3699,7 +3714,7 @@ UUID uuid = UUID.randomUUID();   // 32位
 
 ![image-20240824144231987](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408241442147.png)
 
-集合就是容器，存储的是引用地址，有collection：存储单个元素和map：以键值对存储元素两种。
+集合就是容器，存储的是引用地址，collection：存储单个元素 || map：以键值对存储元素两种集合。
 
 ![image-20240824195941170](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408241959247.png)
 
@@ -3842,6 +3857,125 @@ new 接口名() {
     ...
 }
 ```
+
+
+
+### ArrayList
+
+![image-20240826002002619](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408260020729.png)
+
+![image-20240826125041309](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408261250398.png)
+
+默认无参创建时的数组长度为0，当第一次调用add方法时，底层调用grow()方法会长度为10；
+
+扩容为原来容量的1.5倍
+
+
+
+修改元素：set方法会返回修改前的数据
+
+```java
+List<String> arrList = new ArrayList<>();
+arrlist.add("zhangsan");
+String s = arrList.set(0, "李四")  // s == zhnagsan
+```
+
+
+
+插入元素add
+
+```java
+arrlist.add(0, "xixi");
+```
+
+![image-20240826151904153](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408261519256.png)
+
+
+
+删除元素remove
+
+![image-20240826152043640](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408261520712.png)
+
+![image-20240826152200398](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408261522465.png)
+
+
+
+### Vector
+
+![image-20240826155355937](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408261553034.png)
+
+线程安全的数组实现List
+
+默认容量为10
+
+扩容后为原容量的2倍
+
+
+
+### 链表
+
+![image-20240826155530319](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408261555407.png)
+
+
+
+### LinkedList
+
+![image-20240826162337463](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408261623530.png)
+
+> ***属性***
+
+```java
+LinkedList<String> ll = new LinkedList<>();
+// 创建一个空链表  size=0  有头结点和尾结点
+
+ll.add("1")
+```
+
+![image-20240826163712952](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408261637037.png)
+
+
+
+> ***插入操作***
+
+![image-20240826165824700](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408261658813.png)
+
+
+
+> ***修改操作***
+
+**找到结点改其item值就行，然后返回一个改前的旧值**
+
+
+
+> ***删除操作***
+
+![image-20240826170359588](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408261703668.png)
+
+![image-20240826171030687](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408261710740.png)
+
+
+
+**remove方法返回被删除的值**
+
+
+
+
+
+### 手写单向链表
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
