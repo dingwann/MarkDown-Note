@@ -3835,13 +3835,17 @@ public interface i<T> {
 
 
 
-### List接口
+### List 接口
 
 ![image-20240825214059849](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408252141096.png)
 
 ![image-20240825215457823](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408252154943.png)
 
 - **remove和set方法，调用了previous()也行的。**
+
+
+
+> **Comparator接口**
 
 ![image-20240825233548090](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408252335211.png)
 
@@ -3963,10 +3967,17 @@ ll.add("1")
 
 ### 手写单向链表
 
+```java
+// add
 
+// add(index, item)
 
+// remove
 
+// set(index, item)
 
+// get
+```
 
 
 
@@ -3974,80 +3985,638 @@ ll.add("1")
 
 
 
+### 栈
 
+数组模拟，后进先出，对尾元素进行添加，尾元素进行弹出。
 
+双向链表模拟
 
+![image-20240907143740084](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409071437272.png)
 
+------
 
+<img src="https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409071442474.png" alt="image-20240907144245396" style="zoom: 80%;" />
 
+![image-20240907144351069](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409071443170.png)
 
+```java
+import java.util.ArrayDeque;
+import java.util.LinkedList;
+import java.util.Stack;
 
+/**
+ *  java.util.Stack  底层是数组，线程安全，Java6+不建议使用
+ *  java.util.ArrayDeque   底层也是数组，实现了Stack和双端队列
+ *  java.util.LinkedList   底层双向链表，实现了Stack和双端队列
+ *
+ * */
 
+public class StackTest {
+    public static void main(String[] args) {
+        // 创建栈对象
+        Stack<String> stack1 = new Stack<>();
+        ArrayDeque<String> stack2 = new ArrayDeque<>();
+        LinkedList<String> stack3 = new LinkedList<>();
 
+        // 压栈
+        stack1.push("1");
+        stack1.push("2");
+        stack1.push("3");
+        stack1.push("4");
 
+        // seach 从栈顶往下搜索，返回数字
+        System.out.println("position: " + stack1.search("1"));
 
+        // 弹栈
+        System.out.println(stack1.pop());
+        System.out.println(stack1.pop());
+        System.out.println(stack1.pop());
 
+        // peek
+        System.out.println("Stack top：" + stack1.peek());
 
+        // 压栈
+        stack2.push("a");
+        stack2.push("b");
+        stack2.push("c");
+        stack2.push("d");
+        // 弹栈
+        System.out.println(stack2.pop());
+        System.out.println(stack2.pop());
+        System.out.println(stack2.pop());
+        System.out.println(stack2.pop());
 
+        // 压栈
+        stack3.push("A");
+        stack3.push("B");
+        stack3.push("C");
+        stack3.push("D");
+        // 弹栈
+        System.out.println(stack3.pop());
+        System.out.println(stack3.pop());
+        System.out.println(stack3.pop());
+        System.out.println(stack3.pop());
+    }
+}
 
+```
 
 
 
+### 队列与双端队列
 
+![image-20240907150035188](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409071500407.png)
 
+- **入队：offer**
+- **出队：poll**
 
 
 
+**LinkedList双向链表模拟**
 
+**ArrayDeque逻辑上是一个环形数组模拟的**
 
+![image-20240907151335622](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409071513713.png)
 
+> **Queue**
 
+```java
+import java.util.ArrayDeque;
+import java.util.LinkedList;
+import java.util.Queue;
 
+/**
+ * java.util.ArrayDeque
+ * java.util.LinkedList
+ * 以上两个类都实现FIFO结构
+ * */
 
+public class QueueTest {
+    public static void main(String[] args) {
+        // 创建队列对象
+        Queue<String> deque1 = new ArrayDeque<>();
+        Queue<String> deque2 = new LinkedList<>();
 
+        // 入队
+        deque1.offer("1");
+        deque1.offer("2");
+        deque1.offer("3");
+        deque1.offer("4");
+        // 出队
+        System.out.println(deque1.poll());
+        System.out.println(deque1.poll());
+        System.out.println(deque1.poll());
+        System.out.println(deque1.poll());
 
+        // 入队
+        deque2.offer("a");
+        deque2.offer("b");
+        deque2.offer("c");
+        deque2.offer("d");
+        // 出队
+        System.out.println(deque2.poll());
+        System.out.println(deque2.poll());
+        System.out.println(deque2.poll());
+        System.out.println(deque2.poll());
+    }
+}
 
+```
 
+> **Deque**
 
+```java
+import java.util.ArrayDeque;
+import java.util.Deque;
 
+public class DequeTest {
+    public static void main(String[] args) {
+        // 队尾进，队头出
+        Deque<String> deque1 = new ArrayDeque<>();
+        // 进
+        deque1.offerLast("1");
+        deque1.offerLast("2");
+        deque1.offerLast("3");
+        // 出
+        System.out.println(deque1.pollFirst());
+        System.out.println(deque1.pollFirst());
+        System.out.println(deque1.pollFirst());
 
+        // 队头进，队尾出
+        // 进
+        deque1.offerFirst("a");
+        deque1.offerFirst("b");
+        deque1.offerFirst("c");
+        // 出
+        System.out.println(deque1.pollLast());
+        System.out.println(deque1.pollLast());
+        System.out.println(deque1.pollLast());
+    }
+}
 
+```
 
 
 
 
 
+### Set 接口
 
+**HashSet底层是HashMap，Set接口的实现类都是new的对应Map接口/类**
 
+![image-20240907153730575](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409071537634.png)
 
+**将Map的key部分取出来对应的就是set集合**
 
 
 
 
 
+### Map 接口
 
+map的继承实现结构和set类似，但是和collection没有继承关系，自己就是顶级接口。
 
+以key-value进行存储，都是引用类型。
 
+key主导，value是附属作用。
 
+![image-20240907154058021](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409071540077.png)
 
 
 
+> **继承和实现结构**
 
+![image-20240907155444402](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409071554507.png)
 
 
 
+> **Map 常用方法**
 
+![image-20240907155543582](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409071555679.png)
 
+  遍历Map集合：
 
+```java
+// 对key进行遍历用get得到其value
+Map<Integer, String> maps = new HashMap<>();
 
+Set<Integer> keys = maps.keySet();
+Iterator<Integer> it = keys.iterator();
+while(it.hasNext()) {
+    Integer key = it.next();
+    String value = maps.get(key);
+}
 
+// for-each
 
+// 下面该方式效率较高
+// 调用map集合的entrySet方法拿到一个set集合，该集合存储的元素就是map集合的键值对
+Set<Map.Entry<Integer, String>> entries = maps.entrySet();
+```
 
+![image-20240909194243412](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409091942582.png)
 
 
 
+#### key 的特点
 
-## 正则表达式
+> **Hashmap：**
+
+- **key无序不可重复（无序指存的顺序和取的顺序不一定一样）**
+
+- **key重复的话，value会覆盖**
+
+**Hash == 散列**
+
+![image-20240910094910345](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409100949493.png)
+
+上面是单向链表，其Node结点有四个属性，put方法的本质就是new node结点
+
+hash值是调用根类中的hashCode方法根据key得到的
+
+![image-20240910100341526](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409101003660.png)
+
+> **Hash表的一维数组的长度永远是2的倍数**
+
+
+
+#### 哈希表存储原理
+
+![image-20240910104430443](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409101044546.png)
+
+
+
+> **Hash表的存储原理**
+
+![image-20240910100633835](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409101006934.png)
+
+
+
+**用哈希值对数组长度取模的作用是其索引值永远不会越界！**
+
+
+
+> **哈希表中的key如果是自定义类的话，为了满足以上哈希表的特性，其中的hashCode和equals都得必须一起重写，idea工具提供快捷操作。**
+
+
+
+例如下面的User类：
+
+![image-20240910103520791](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409101035930.png)
+
+
+
+
+
+> **Hash表的key可以是null**
+
+![image-20240910104527853](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409101045940.png)
+
+- **null不会走存储原理的流程，直接存在哈希表的0号索引处。**
+
+
+
+#### 手写HashMap
+
+![image-20240910104659894](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409101047005.png)
+
+
+
+```java
+public class MyHashMap<K, V> {
+
+    private Node<K, V>[] table;
+
+    private int size;
+
+    public int size() {
+        return size;
+    }
+
+
+    @SuppressWarnings("unchecked")
+    public MyHashMap() {
+        this.table = new Node[16];
+    }
+
+    static class Node<K, V> {
+        int hash;
+        K key;
+        V value;
+        Node<K, V> next;
+
+        public Node(int hash, K key, V value, Node<K, V> next) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
+
+        @Override
+        public String toString() {
+            return "[" + key + "," + value + "]";
+        }
+    }
+
+    public V put(K key, V value) {
+        if(null == key) {
+            return keyOfNull(key, value);
+        }
+
+        int hash = key.hashCode();
+        int index = Math.abs(hash % table.length);
+
+        Node<K, V> node = table[index];
+        if(null == node) {
+            node = new Node<K, V>(hash, key, value, null);
+            this.size++;
+            return value;
+        }
+
+        Node<K, V> prevNode = null;
+        while (node != null) {
+            if(node.key == key) {
+                V oldValue = value;
+                node.value = value;
+                return oldValue;
+            }
+            prevNode = node;
+            node = node.next;
+        }
+        prevNode.next = new Node<>(hash, key, value, null);
+        return value;
+
+    }
+
+    private V keyOfNull(K key, V value) {
+        Node<K, V> node = table[0];
+
+        if(node == null) {
+            node = new Node<>(0, key, value, null);
+            this.size++;
+            return value;
+        }
+
+        Node<K, V> prevNode = null;
+        while (node != null) {
+            if(node.key == null) {
+                node.value = value;
+                this.size++;
+                return node.value;
+            }
+            prevNode = node;
+            node = node.next;
+        }
+
+        prevNode.next = new Node<>(0, key, value, null);
+        this.size++;
+        return value;
+    }
+
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < table.length; i++) {
+            Node<K, V> node = table[i];
+            while (node != null) {
+                sb.append(node);
+                sb.append("\n");
+                node = node.next;
+            }
+        }
+        return sb.toString();
+    }
+}
+
+```
+
+
+
+![image-20240910143626897](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409101436126.png)
+
+
+
+```java
+```
+
+
+
+
+
+#### HashMap在Java8及以后的改变
+
+![image-20240910144935961](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409101449059.png)
+
+
+
+
+
+> **HashMap容量问题**
+
+![image-20240910151906236](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409101519418.png)
+
+- **取模操作想要和按位与一样必须要求其值是2的次幂**
+
+
+
+
+
+> **HashMap初始化容量设置**
+
+![image-20240910154410692](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409101544889.png)
+
+- **为了提高程序效率，应该减少HashMap的扩容次数**
+
+- **初始化为理论存储容量的2的次幂长度，但是有负载因子，所以最终设置值要乘0.75算出来的去接近设置的理论值**
+
+
+
+------
+
+#### LinkedHashMap
+
+![image-20240911140614046](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409111406125.png)
+
+<img src="https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409111406739.png" alt="image-20240911140632663" style="zoom: 67%;" />
+
+- **有序不可重复**
+- **有序指有下标，可以保证元素的插入顺序和取出顺序一致**
+- **LinkedHashMap是HashMap的子类，用法和HashMap几乎一致**
+- **LinkedHashMap的key也得同时重写equals和hashCode**
+
+
+
+```java
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+
+public class LinkedHashMapTest {
+    public static void main(String[] args) {
+        LinkedHashMap<Integer, String> maps = new LinkedHashMap<>();
+        maps.put(11, "a");
+        maps.put(2888, "b");
+        maps.put(3, "c");
+        maps.put(22, "d");
+        
+        // 遍历
+        Set<Map.Entry<Integer, String>> entries = maps.entrySet();
+        for (Map.Entry<Integer, String> entry : entries) {
+            System.out.println(entry.getKey() + " " + entry.getValue());
+        }
+    }
+}
+
+```
+
+开销大，一般不用，有需求才用。
+
+
+
+
+
+#### HashTable
+
+![image-20240911140913613](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409111409709.png)
+
+
+
+```java
+import java.util.*;
+
+public class Hashtable {
+    public static void main(String[] args) {
+        // Hashtable中独有的迭代方式
+
+        Hashtable<Integer, String> hashTable = new Hashtable<>();
+
+        hashTable.put(1, "a");
+        hashTable.put(2, "b");
+        hashTable.put(3, "c");
+
+        // 迭代
+        // key 迭代
+        Enumeration<Integer> keys = hashTable.keys();
+        while (keys.hasMoreElements()) {
+            Integer i = keys.nextElement();
+            System.out.println(i);
+        }
+        
+        // value迭代
+        Enumeration<String> elements = hashTable.elements();
+        while (elements.hasMoreElements()) {
+            String s = elements.nextElement();
+            System.out.println(s);
+        }
+    }
+}
+
+```
+
+
+
+#### Properties
+
+![image-20240911144602600](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409111446675.png)
+
+![image-20240911144536949](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409111445082.png)
+
+
+
+
+
+#### 二叉树
+
+![image-20240911144750089](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409111447193.png)
+
+
+
+> **排序二叉树**
+
+![image-20240911145107818](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409111451919.png)
+
+![image-20240911145738598](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409111457691.png)
+
+
+
+> **平衡二叉树**
+
+![image-20240911145914304](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409111459414.png)
+
+
+
+
+
+> **红黑树**
+
+![image-20240911150741040](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409111507199.png)
+
+
+
+#### TreeMap
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 正则表达式
 
 ![image-20240822003806770](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408220038860.png)
 
@@ -4143,7 +4712,7 @@ ll.add("1")
 
 
 
-## Java 虚拟机规范
+# Java 虚拟机规范
 
 HotSpot ---->  Oeacle JDK、Open JDK在用
 
