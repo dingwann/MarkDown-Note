@@ -4162,11 +4162,49 @@ public class DequeTest {
 
 ### Set 接口
 
+![image-20240913133204487](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409131332596.png)
+
+
+
 **HashSet底层是HashMap，Set接口的实现类都是new的对应Map接口/类**
 
 ![image-20240907153730575](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409071537634.png)
 
 **将Map的key部分取出来对应的就是set集合**
+
+
+
+#### HashSet
+
+![image-20240913134914702](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409131349832.png)
+
+
+
+HashSet面试题：
+
+![image-20240913142103985](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409131421149.png)
+
+
+
+#### LinkedHashSet
+
+![image-20240913135337588](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409131353655.png)
+
+
+
+
+
+#### TreeSet
+
+![image-20240913135455636](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409131354716.png)
+
+
+
+
+
+
+
+
 
 
 
@@ -4555,6 +4593,82 @@ public class Hashtable {
 
 
 #### TreeMap
+
+![image-20240912221839794](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409122218860.png)
+
+- **该集合存储的key会排好序。**
+- **key不能为null，但是value可以**
+
+
+
+>  **自定义类做key**
+
+实现comparable接口实现comparaTo方法（适合比较规则不变的情况）
+
+单独的比较器完成排序（比较规则可能改变）
+
+- 因为TreeMap有一个构造方法参数可以传递比较器对象
+
+![image-20240913132502718](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409131325857.png)
+
+比较器可以采用匿名内部类的方式
+
+![image-20240913133111200](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409131331277.png)
+
+
+
+#### 集合null问题的总结
+
+- **Hashtable的 key和 value都不可以为null**
+- **properties的 key和 value也不可以为null**
+- **TreeMap的key不可以为null**
+- **TreeSet不能添加null**
+
+
+
+
+
+#### Collections工具类
+
+![image-20240913142206179](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409131422268.png)
+
+
+
+>  sort排序集合元素为自定义类型时也需要实现排序接口或者比较器进行排序。
+
+
+
+![image-20240913142919731](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409131429813.png)
+
+
+
+
+
+------
+
+
+
+# IO 流
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
