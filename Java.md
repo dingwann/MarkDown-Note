@@ -378,13 +378,13 @@ long e = 2147483648  // int整型溢出
 
 **大  ----> 小，可能造成精度损失，原理就是砍掉左侧多余的二进制**
 
-**精度损失与否看转换后类型能否存下**
+***精度损失与否看转换后类型能否存下***
 
 ```java
 byte = (byte)150;  // ()强制转换
 ```
 
-例如：
+例如： 
 
 ```java
 long a = 55L;
@@ -1077,7 +1077,7 @@ if() xxx;
 
 **字符串比较不能用 == ，必须手动调用equals方法进行比较**
 
-**因为==比较的是对象的值，字符串本质是String，自动装箱的因为String重写了equal方法所以没问题。new出来的话就会造成其内存地址不一样而造成误判**
+**因为==比较的是对象的值，字符串本质是String，自动装箱的因为会放在字符串常量池（String重写了equal方法）所以没问题。new出来的话就会造成其内存地址不一样而造成误判**
 
 ```java
 String name = "wangcai"
@@ -1648,7 +1648,7 @@ public class Test {
 
 #### this关键字
 
-出现在实例方法中，代表当前的对象。this 大部分情况下可以省略。
+出现**在实例方法中**，代表当前的对象。this 大部分情况下可以省略。
 
 this也是个引用，代表当前的对象。
 
@@ -2072,7 +2072,7 @@ false: a 引用指向的对象不是 Cat 类型
 
 ```java
 if(a instanceof Bird) {
-   Bird b = (Bird)a; 
+   Bird b = (Bird) a; 
 }
 ```
 
@@ -2226,8 +2226,6 @@ MyInterFace.staticMethod();
 > **实例方法**
 
 ![image-20240827180426324](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408271804399.png)
-
-
 
 
 
@@ -3870,9 +3868,9 @@ new 接口名() {
 
 ![image-20240826125041309](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408261250398.png)
 
-默认无参创建时的数组长度为0，当第一次调用add方法时，底层调用grow()方法会长度为10；
+**默认无参创建时的数组长度为0，当第一次调用add方法时，底层调用grow()方法会长度为10；**
 
-扩容为原来容量的1.5倍
+**扩容为原来容量的1.5倍**
 
 
 
@@ -4197,10 +4195,6 @@ HashSet面试题：
 #### TreeSet
 
 ![image-20240913135455636](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409131354716.png)
-
-
-
-
 
 
 
@@ -4650,6 +4644,497 @@ public class Hashtable {
 
 # IO 流
 
+## 概述
+
+![image-20240916141142825](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409161411237.png)
+
+
+
+> **输入和输出是相对于内存说的**
+
+
+
+![image-20240916142245383](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409161422568.png)
+
+
+
+
+
+> **体系结构**
+
+![image-20240916143605937](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409161436143.png)
+
+
+
+*xmind：*
+
+![image-20240916143650077](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409161436292.png)
+
+
+
+## FileInputStream
+
+- **文件字节流，负责读**
+- **万能的读，但是建议读非文本文件（二进制）**
+
+
+
+> **构造方法**
+
+![image-20240916145702126](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409161457375.png)
+
+String name：文件的路径
+
+
+
+> **常用方法**
+
+![image-20240916145733747](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409161457955.png)
+
+int read()：调用一次read方法读取一个字节，返回读到的字节本身，读不到任何数据返回 -1
+
+![image-20240916151948487](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409161519651.png)
+
+int read(byte[] b)：一次最多可以读b.length个字节，返回值是读取到的字节数量，如果这一次读不到任何数据返回 -1
+
+![image-20240916151853514](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409161518748.png)
+
+![image-20240916152240064](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409161522234.png)
+
+int read(byte[] b, int off, int len)：一次读len个字节，读取到的数据从off位置开始放，如果这一次读不到任何数据返回 -1
+
+![image-20240916152847267](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409161528602.png)
+
+文件内容：abcdef
+
+// 0 0 97 98 99 100 101 0 0 0
+
+
+
+long skip(long n)：跳过n个字节
+
+
+
+int available()：获取流中预估计的剩余字节数
+
+![image-20240916153344657](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409161533817.png)
+
+
+
+
+
+## FileOutputStream
+
+![image-20240916204420630](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409162044815.png)
+
+- **文件字节输出流，负责写**
+
+
+
+> **构造方法**
+
+![image-20240916202902984](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409162029211.png)
+
+**FileOutputStream(String name)**  ----  创建一个文件字节输出流对象，这个流在使用的时候，**最开始（第一次写的时候）会将原文件内容全部清空，然后写入。**
+
+**FileOutputStream(String name, boolean append)**  ----  创建一个文件字节输出流对象，**当append为true的时候，不会清空原文件的内容，会在原文件的末尾追加写入，append为false时会清空覆盖。**
+
+
+
+> 常用方法
+
+![image-20240916203454813](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409162034056.png)
+
+flush：刷新
+
+![image-20240916203709803](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409162037990.png)
+
+
+
+> **拷贝文件**
+
+- **使用FileInputStream读文件，使用FileOutputStream写文件**
+- **一边读，一边写**
+
+![image-20240916205107763](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409162051983.png)
+
+
+
+## try-with-resources
+
+Java7新特性
+
+资源自动关闭：
+
+​	凡是实现了AutoCloseable接口的流都可以使用try-with-resources，都会自动关闭。
+
+​	AutoCloseable是Closeable的父亲，意思所有流都支持。
+
+语法：
+
+```java
+try(
+    声明流;
+    声明流;
+    声明流;
+) {
+    
+}catch(Exception e) {
+    
+}
+```
+
+![image-20240916210149456](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409162101649.png)
+
+
+
+## FileReader
+
+![image-20240916211030259](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409162110426.png)
+
+- **文件字符输入流，以字符形式，只适用读普通文本文件**
+
+- **一次至少读取一个完整的字符**
+
+
+
+![image-20240916210942389](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409162109578.png)
+
+
+
+## FileWriter
+
+![image-20240916211058996](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409162110170.png)
+
+
+
+![image-20240916211553123](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409162115316.png)
+
+
+
+> **复制普通文本文件**
+
+![image-20240916211920142](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409162119459.png)
+
+
+
+
+
+## Buffered 缓冲流
+
+![image-20240917152828834](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409171528146.png)
+
+![image-20240917150325794](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409171503050.png)
+
+写就是利用这个大的bytes数组一次写过去，读的时候也不是和硬盘进行交互，会提前将内容放在内存的大byte数组中，然后程序员去读，目的都是为了减少IO次数。
+
+
+
+### BufferedInputStream
+
+```java
+@Test
+public void bufferedInputStreamTest() {
+    /*该包装流需要节点流*/
+    BufferedInputStream bis = null;
+    try {
+        bis = new BufferedInputStream(new FileInputStream("src/file.txt"));
+
+        byte[] bytes = new byte[1024];
+        int readCount = 0;
+        while ((readCount = bis.read(bytes)) != -1) {
+            System.out.println(new String(bytes, 0, readCount));
+        }
+
+    } catch (FileNotFoundException e) {
+        throw new RuntimeException(e);
+    } catch (IOException e) {
+        throw new RuntimeException(e);
+    } finally {
+        if (bis != null) {
+            try {
+                bis.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+}
+```
+
+
+
+### BufferedOutputStream
+
+```java
+@Test
+public void bufferedOutputStreamTest() {
+    BufferedOutputStream bos = null;
+    try {
+        bos = new BufferedOutputStream(new FileOutputStream("src/file2.txt"));
+
+        bos.write("wangcai".getBytes());
+
+    } catch (FileNotFoundException e) {
+        throw new RuntimeException(e);
+    } catch (IOException e) {
+        throw new RuntimeException(e);
+    } finally {
+        if (bos != null) {
+            try {
+                bos.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+}
+```
+
+
+
+> **BufferedReader和BufferedWriter同理**
+
+**BufferedReader中有个方法readLine()是按\n读取一行，当读不到或者末尾了时返回 null 值而不是 -1**
+
+
+
+
+
+### mark() 与 reset()
+
+![image-20240917154543466](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409171545697.png)
+
+
+
+读取到什么位置时调用了mark方法就会打上一个标记后接着读
+
+调用reset就会回到刚才上一次打mark方法的位置重复读
+
+目的是重复读取
+
+
+
+```java
+@Test
+public void markAndresetTest() {
+    // Reader及子类支持，Writer不支持该机制
+    // FileReader 不是节点流
+    BufferedReader br = null;
+    try {
+        br = new BufferedReader(new FileReader("src/file.txt"));
+
+        System.out.println(br.read());
+        System.out.println(br.read());
+        br.mark(3);
+        System.out.println(br.read());
+        System.out.println(br.read());
+        br.reset();
+        System.out.println(br.read());
+        System.out.println(br.read());
+        System.out.println(br.read());
+
+    } catch (FileNotFoundException e) {
+        throw new RuntimeException(e);
+    } catch (IOException e) {
+        throw new RuntimeException(e);
+    } finally {
+        if (br != null) {
+            try {
+                br.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+}
+/*
+97
+98
+99
+100
+99
+100
+101
+*/
+```
+
+
+
+## FileReader
+
+按理说不会乱码的，但是**涉及到解码**的问题，**平台字符集和文档不一致时就会乱码。**
+
+![image-20240917161708752](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409171617980.png)
+
+
+
+## FileWriter
+
+按理说不会乱码的，但是**涉及到编码**的问题，**平台字符集和文档不一致时就会乱码。**
+
+![image-20240917162306784](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409171623002.png)
+
+测试的时候用append方式，不然默认会改成UTF-8
+
+
+
+## InputStreamReader(转换流)
+
+- **使用InputStreamReader可以指定字符集，可以解决读乱码问题**
+- **InputStreamReader是字符流**
+- **InputStreamReader是输入的过程，解码的过程**
+
+![image-20240917163126844](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409171631143.png)
+
+![image-20240917163152033](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409171631215.png)
+
+
+
+> **构造方法**
+
+![image-20240917163513934](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409171635089.png)
+
+
+
+```java
+@Test
+public void inputStreamReaderTest() {
+
+    InputStreamReader isr = null;
+    try {
+        isr = new InputStreamReader(new FileInputStream("src/file.txt"), StandardCharsets.UTF_8);
+
+        char[] chars = new char[1024];
+        int readCount = 0;
+        while((readCount = isr.read(chars)) != -1) {
+            System.out.println(new String(chars, 0, readCount));
+        }
+
+    } catch (FileNotFoundException e) {
+        throw new RuntimeException(e);
+    } catch (IOException e) {
+        throw new RuntimeException(e);
+    } finally {
+        if (isr != null) {
+            try {
+                isr.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+}
+```
+
+
+
+> **InputStreamWriter（转换流）同理**
+
+
+
+## FileReader是包装流
+
+> **因为它的父类就是包装流**
+
+![image-20240917165358589](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409171653778.png)
+
+上小节代码过于冗长，在IO流中给InputStreamReader提供了一个子类：FileReader
+
+![image-20240917165004170](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409171650383.png)
+
+- 这里指定字符集不是字符串，是Charset对象
+
+```java
+// 可以这样生成该对象
+Charset.forName("GBK");
+
+FileReader fr = new FileReader(src, Charset.forName(""));
+```
+
+
+
+
+
+## **OutputStreamWriter(转换流)**
+
+- **使用OutputStreamWriter可以指定字符集，可以解决写乱码问题**
+- **OutputStreamWriter是字符流**
+- **OutputStreamWriter是输出的过程，编码的过程**
+- **FileWriter是OutputStreamWriter的子类，也是包装流**
+
+![image-20240917163152033](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409171657614.png)
+
+![image-20240917170544745](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409171705984.png)
+
+
+
+
+
+## DataOutputStream(数据输出流)
+
+> **可以带着数据类型的状态写入文件当中**
+
+- **DataOutputStream写的数据只能用DataIntputStream去读**
+- **数据字节输出流，直接将内容写到文件中，写进去就是二进制**
+- **写的效率很高，因为不需要转码，包括DataIntputStream**
+
+
+
+![image-20240917171323271](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409171713477.png)
+
+
+
+```java
+@Test
+public void dataOutputStreamTest() {
+    // 包装流
+    DataOutputStream dos = null;
+    try {
+        dos = new DataOutputStream(new FileOutputStream("src/xixi"));
+
+        byte b = 127;
+        short s = 32767;
+        int i = 233434;
+        long l = 1288888L;
+        float f = 2.0F;
+        double d = 22.4;
+        boolean flag = false;
+        char c = '国';
+        String str = "嘟嘟哒";
+
+        dos.writeByte(b);
+        dos.writeShort(s);
+        // ...
+        dos.writeUTF(str);
+
+    } catch (FileNotFoundException e) {
+        throw new RuntimeException(e);
+    } catch (IOException e) {
+        throw new RuntimeException(e);
+    } finally {
+        if (dos != null) {
+            try {
+                dos.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+}
+```
+
+
+
+
+
+## DataInputStream(数据输入流)
+
+- **数据字节输入流**
+- **专门读取DataOutputStream流写入的文件**
+- **读取顺序要和写入的顺序一致（要不然无法恢复原样）**
+
+![image-20240917213815779](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409172138971.png)
 
 
 
@@ -4657,54 +5142,124 @@ public class Hashtable {
 
 
 
+## 序列化和反序列化
+
+![image-20240917215338721](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409172153815.png)
+
+
+
+## ObjectOutputStream
+
+- **对象字节输出流**
+- **完成对象的序列化过程**
+- **可以将JVM中的对象序列化到文件/网络中**
+- **序列化：将Java对象转换为字节序列的过程（字节序列可以在网络中传输。）**
+- **序列化：serial**
+
+
+
+> 构造方法
+
+![image-20240917214655950](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409172146036.png)
+
+
+
+```java
+@Test
+public void objectStreamTest() {
+    ObjectOutputStream oos = null;
+    try {
+        oos = new ObjectOutputStream(new FileOutputStream("data"));
+
+        // 创建Java对象
+        Date date = new Date();
+
+        // 序列化 serial
+        oos.writeObject(date);
+
+        // 刷新
+        oos.flush();
+
+    } catch (IOException e) {
+        throw new RuntimeException(e);
+    }finally {
+        if (oos != null) {
+            try {
+                oos.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+}
+```
 
 
 
 
 
+## ObjectInputStream
+
+- **对象字节输入流**
+- **完成反序列化的（将字节序列转换为JVM中的Java对象）**
+
+
+
+> **涉及到多个对象的序列化和反序列化，一般是用集合存储了进行序列化**
+
+
+
+```java
+@Test
+public void objectInputStreamTest() {
+    ObjectInputStream ois = null;
+
+    try {
+        ois = new ObjectInputStream(new FileInputStream("data"));
+
+        try {
+            Date date =(Date) ois.readObject();
+            System.out.println(date);
+
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+    } catch (IOException e) {
+        throw new RuntimeException(e);
+    }finally {
+        if (ois != null) {
+            try {
+                ois.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+}
+```
 
 
 
 
 
+## 序列化和反序列化自定义类型
 
+> **自定义类型必须实现java.io下的Serializable标志接口**
 
+- **类实现该接口后，编译器会自动给该类添加一个序列化版本号属性**
 
+- ***序列化版本号：serialversionUID***
 
+- **序列化版本号作用：**
 
+  **在Java语言中是如何区分Class版本的？**
 
+  **首先通过类的名字，然后再通过序列化版本号进行区分**
 
+  **最初的对象序列化以后对该类进行了修改，再进行反序列化时就会报错。**
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+![image-20240917222155349](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409172221579.png)
 
 
 
