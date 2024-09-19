@@ -4695,7 +4695,7 @@ int read()：调用一次read方法读取一个字节，返回读到的字节本
 
 ![image-20240916151948487](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409161519651.png)
 
-int read(byte[] b)：一次最多可以读b.length个字节，返回值是读取到的字节数量，如果这一次读不到任何数据返回 -1
+int read(byte[] b)：一次最多可以读b.length个字节，返回值是读取到的**字节数量**，如果这一次读不到任何数据返回 -1
 
 ![image-20240916151853514](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409161518748.png)
 
@@ -4745,7 +4745,7 @@ int available()：获取流中预估计的剩余字节数
 
 ![image-20240916203454813](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409162034056.png)
 
-flush：刷新
+flush：将缓存内容全部写出进行刷新，输出流都有该方法。
 
 ![image-20240916203709803](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409162037990.png)
 
@@ -4764,11 +4764,11 @@ flush：刷新
 
 Java7新特性
 
-资源自动关闭：
+**资源自动关闭：**
 
 ​	凡是实现了AutoCloseable接口的流都可以使用try-with-resources，都会自动关闭。
 
-​	AutoCloseable是Closeable的父亲，意思所有流都支持。
+​	**AutoCloseable是Closeable的父亲，意思所有流都支持。**
 
 语法：
 
@@ -4826,7 +4826,7 @@ try(
 
 ![image-20240917150325794](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409171503050.png)
 
-写就是利用这个大的bytes数组一次写过去，读的时候也不是和硬盘进行交互，会提前将内容放在内存的大byte数组中，然后程序员去读，目的都是为了减少IO次数。
+写就是利用这个大的bytes数组一次写过去，读的时候也不是和硬盘进行交互，会提前将内容放在内存的大byte数组中，然后程序员去读，目的都是为了**减少IO次数。**
 
 
 
@@ -4835,7 +4835,7 @@ try(
 ```java
 @Test
 public void bufferedInputStreamTest() {
-    /*该包装流需要节点流*/
+    /*该包装流需要节点输入流*/
     BufferedInputStream bis = null;
     try {
         bis = new BufferedInputStream(new FileInputStream("src/file.txt"));
@@ -4975,7 +4975,7 @@ public void markAndresetTest() {
 
 ![image-20240917162306784](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409171623002.png)
 
-测试的时候用append方式，不然默认会改成UTF-8
+测试的时候用append方式，不然默认会将文档改成平台默认编码UTF-8
 
 
 
@@ -5339,7 +5339,7 @@ private transient int age;
 ```java
 @Test
 public void inputStreamTest() throws Exception{
-    // 获取标准输入流（全局输入流），不需要手动关，JVM退出的时候自动关闭该流。
+    // 获取标准输入流（全局输入流）, 不需要手动关, JVM退出的时候自动关闭该流。
     InputStream in = System.in;  // System.in从控制台读数据
 
     Scanner sc = new Scanner(in);  // 扫描器
@@ -5484,8 +5484,6 @@ public void fileTest() throws Exception{
 
 
 
-
-
 ## 筛选过滤后的文件
 
 ![image-20240918141031054](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409181410207.png)
@@ -5547,7 +5545,7 @@ public void dirCopy() {
     // 目标
     File pos = new File("E:\\test\\a\\b");
 
-    // 获取拷贝源所有的文件及目录
+    // 获取拷贝源所有的文件及目录进行拷贝
     copy(src, pos);
 
 }
@@ -5573,10 +5571,12 @@ private void copy(File src, File pos) {
         return;
     };
 
-    // 如果是目录进行拷贝目录
+    // 进入到此处证明是目录, 是目录进行拷贝目录
+    
+    // 生成路径
     File newFile = new File(pos.getAbsolutePath() + src.getAbsolutePath().substring(2));
     if (!newFile.exists()) {
-        newFile.mkdirs();
+        newFile.mkdirs();    // 创建多层目录
     }
 
     File[] files = src.listFiles();
@@ -5680,7 +5680,7 @@ public void bundleProperties() {
 - **目标：在松耦合前提下，完成功能的扩展，代替继承防止类爆炸**
 - **在装饰器设计中，两个重要角色：装饰者与被装饰者**
 
-- **装饰器设计模式中，要求装饰者与被装饰者应实现同一个接口/同一些接口，继承同一个抽象类**
+- **装饰器设计模式中，要求装饰者与被装饰者应实现同一个接口/同一些接口/继承同一个抽象类**
 
 - **因为实现同一个接口以后，对于客户端程序来说，使用装饰者时就像在使用被装饰者一样**
 - **装饰者中含有被装饰者的引用（A has a B），尽量使用has a[耦合度低一些]，不要使用is a**
@@ -5879,6 +5879,347 @@ public class DecoratorTest {
     fly time:0
 */
 ```
+
+
+
+***继承关系：***
+
+![image-20240919141434686](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409191414790.png)
+
+
+
+
+
+## GZIPOutputStream(压缩流)
+
+![image-20240919141645464](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409191416595.png)
+
+
+
+```java
+@Test
+public void gzipOutputStream() throws Exception{
+
+    // 文件输入流
+    FileInputStream file = new FileInputStream("e:/test.txt");
+
+    // 创建压缩流
+    GZIPOutputStream gzip = new GZIPOutputStream(new FileOutputStream("e:/test.gz"));
+
+    // 读取了压缩写入
+    byte[] bytes = new byte[1024];
+    int readCount = 0;
+    while((readCount = file.read(bytes)) != -1) {
+        gzip.write(bytes, 0, readCount);
+    }
+
+    // 标志压缩完成并且自动刷新, 不需要手动刷新, 必须写
+    gzip.finish();
+
+    file.close();
+    gzip.close();
+}
+```
+
+
+
+
+
+## GZIPInputStream(解压缩)
+
+节点流不需要手动 刷新，在关闭的时候自动刷新，包装流才需要手动。
+
+
+
+```java
+@Test
+public void gzipInputStreamTest() throws Exception{
+    // 解压缩流
+    // 创建gzip输入流
+    GZIPInputStream gzip = new GZIPInputStream(new FileInputStream("e:/test.txt.gz"));
+
+    // 创建输出流
+    FileOutputStream fos = new FileOutputStream("e:/test.txt");
+
+    byte[] bytes = new byte[1024];
+    int readCount = 0;
+    while((readCount = gzip.read(bytes)) != -1) {
+        fos.write(bytes, 0, readCount);
+    }
+
+    gzip.close();
+    fos.close();
+}
+```
+
+
+
+
+
+
+
+## 字节数组流(内存流)
+
+![image-20240919144054049](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409191440229.png)
+
+![image-20240919144618293](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409191446445.png)
+
+
+
+> **它两属于节点流**
+
+### ByteArrayOutputStream
+
+```java
+@Test
+public void byteArrayOutputStreamTest() {
+
+    ByteArrayOutputStream baos = new ByteArrayOutputStream(); // 默认 new 32字节的byte数组
+
+    // 写
+    baos.write(1);
+    baos.write(2);
+    baos.write(3);
+
+    // 获取该byte数组
+    byte[] byteArray = baos.toByteArray();
+    for(byte b : byteArray) {
+        System.out.println(b);
+    }
+
+}
+```
+
+
+
+> **使用包装流包装数组输出流**
+
+```java
+@Test
+public void byteAaaryOutputStreamAndObjectOutputStream() throws Exception{
+
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    ObjectOutputStream oos = new ObjectOutputStream(baos);
+
+    // 写
+    oos.write(124);
+    oos.writeBoolean(true);
+    oos.writeDouble(3.14);
+    oos.writeUTF("wangcai");
+    oos.writeObject(new Date());
+
+    // 包装流需要手动刷新
+    oos.flush();
+
+    // 获取byte数组
+    byte[] byteArray = baos.toByteArray();
+    for(byte b : byteArray) {
+        System.out.println(b);
+    }
+
+}
+```
+
+
+
+### ByteArrayInputStream
+
+> **可以将输出流写入内存的数据恢复原样**
+
+```java
+@Test
+public void byteAaaryOutputStreamAndObjectOutputStream() throws Exception{
+
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    ObjectOutputStream oos = new ObjectOutputStream(baos);
+
+    // 写
+    oos.write(124);
+    oos.writeBoolean(true);
+    oos.writeDouble(3.14);
+    oos.writeUTF("wangcai");
+    oos.writeObject(new Date());
+
+    // 包装流需要手动刷新
+    oos.flush();
+
+    // 获取byte数组并恢复数据
+    byte[] byteArray = baos.toByteArray();
+
+    ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
+    ObjectInputStream ois = new ObjectInputStream(bais);
+
+    System.out.println(ois.readInt());
+    System.out.println(ois.readBoolean());
+    System.out.println(ois.readDouble());
+    System.out.println(ois.readUTF());
+    System.out.println(ois.readObject());
+}
+```
+
+
+
+
+
+## 对象深克隆
+
+![image-20240919152159027](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409191521211.png)
+
+**目前为止对象的拷贝方式：**
+
+- **调用Object的clone方法，默认浅克隆，需要深克隆需要重写clone**
+- **通过序列化和反序列化完成对象的克隆**
+- **通过ByteArrayOutputStream和ByteArrayInputStream完成对象的深克隆**
+
+```java
+import java.io.Serial;
+import java.io.Serializable;
+
+public class User implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 5681527863603289588L;
+
+    private String name;
+    private int age;
+    private Addr add;
+
+    public User(String name, int age, Addr add) {
+        this.name = name;
+        this.age = age;
+        this.add = add;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public Addr getAdd() {
+        return add;
+    }
+
+    public void setAdd(Addr add) {
+        this.add = add;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                ", add=" + add +
+                '}';
+    }
+}
+```
+
+```java
+import java.io.Serial;
+import java.io.Serializable;
+
+public class Addr implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 5681527863603289589L;
+
+    private String city;
+
+    public Addr(String city) {
+        this.city = city;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    @Override
+    public String toString() {
+        return "Addr{" +
+                "city='" + city + '\'' +
+                '}';
+    }
+}
+```
+
+```java
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
+public class Test {
+    public static void main(String[] args) throws Exception{
+        Addr add = new Addr("成都");
+        User user = new User("wangcai", 21, add);
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(bos);
+
+        oos.writeObject(user);
+        oos.flush();
+
+        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+        ObjectInputStream ois = new ObjectInputStream(bis);
+
+        User user2 = (User) ois.readObject();
+        user2.getAdd().setCity("泸州");
+
+        System.out.println(user);
+        System.out.println(user2);
+    }
+}
+/*
+	User{name='wangcai', age=21, add=Addr{city='成都'}}
+	User{name='wangcai', age=21, add=Addr{city='泸州'}}
+*/
+```
+
+
+
+## IO流总结
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 线程
+
+## 概述
+
+![image-20240919155459337](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409191554559.png)
+
+
+
+
 
 
 
