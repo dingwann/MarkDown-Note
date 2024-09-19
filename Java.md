@@ -5249,7 +5249,7 @@ public void objectInputStreamTest() {
 
 - **类实现该接口后，编译器会自动给该类添加一个序列化版本号属性**
 
-- ***序列化版本号：serialversionUID***
+- ***序列化版本号：serialVersionUID***
 
 - **序列化版本号作用：**
 
@@ -5259,7 +5259,630 @@ public void objectInputStreamTest() {
 
   **最初的对象序列化以后对该类进行了修改，再进行反序列化时就会报错。**
 
+- **只有同一个Class（类名 + 序列化版本号）才能序列化和反序列化**
+
 ![image-20240917222155349](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409172221579.png)
+
+
+
+> 建议如果确定这个类还是以前的类，没有问题，建议将序列化版本号写死！
+
+```java
+private static final long serialVersionUID = 24455543233L;
+```
+
+这样后续修改了代码也能正常反序列化。
+
+
+
+注解：
+
+**@java.io.Serial**：检查下面的属性序列号是否正确
+
+在注解上Alt + Enter可以随机生成一个版本序列号。
+
+
+
+
+
+## transient关键字
+
+> **不让某些属性参与序列化，在属性修饰符上添加transient**
+
+
+
+```java
+private transient int age;
+// 反序列化时只会得到该属性的默认值
+```
+
+
+
+
+
+## PrintStream
+
+![image-20240918104328541](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409181043680.png)
+
+
+
+> **构造方法**
+
+![image-20240918104800908](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409181048002.png)
+
+
+
+![image-20240918105250960](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409181052059.png)
+
+
+
+
+
+## PrintWriter
+
+![image-20240918105410980](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409181054067.png)
+
+
+
+![image-20240918105733396](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409181057498.png)
+
+
+
+
+
+## 标准输入流
+
+![image-20240918110103212](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409181101307.png)
+
+
+
+```java
+@Test
+public void inputStreamTest() throws Exception{
+    // 获取标准输入流（全局输入流），不需要手动关，JVM退出的时候自动关闭该流。
+    InputStream in = System.in;  // System.in从控制台读数据
+
+    Scanner sc = new Scanner(in);  // 扫描器
+
+    byte[] bytes = new byte[1024];
+    int readCount = in.read(bytes);
+
+    for (int i = 0; i < readCount; i++) {
+        System.out.println(bytes[i]);  // 最后的回车是换行符 == 10;
+    }
+}
+```
+
+
+
+> 改变标准输入流的数据源（没啥意义）
+
+```java
+// System.setIn(InputStream in);
+
+// 修改标准输入流的数据源
+System.setIn(new FileInputStream("data"));
+
+// 修改后获取标准输入流
+InputStream in = System.in;  // System.in从控制台读数据
+```
+
+
+
+
+
+## 使用缓冲流包装标准输入流
+
+```java
+@Test
+public void systemInTest() throws Exception{
+    // 创建BufferedReader包装流, 为了用它的readLine();
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+    String s = null;
+    while((s = br.readLine()) != null) {
+        System.out.println("输入了：" + s);
+    }
+
+}
+```
+
+
+
+> **Java已经实现了更好的Scanner扫描器**
+
+
+
+
+
+## 标准输出流
+
+```java
+@Test
+public void systemOutTest() throws Exception{
+    // 标准输出流对象
+    PrintStream out = System.out;  // 向控制台输出
+
+    out.println("s");
+}
+```
+
+
+
+> **标准输出流也可以改变输出方向**
+
+- **可以做日志记录**
+
+```java
+@Test
+public void systemOutTest2() throws Exception{
+    System.setOut(new PrintStream("log"));
+
+    // 获取标准输出流对象
+    PrintStream out = System.out;  // 向控制台输出
+
+    out.println("wangcai");
+}
+```
+
+
+
+
+
+## File类
+
+> **路径的抽象表现形式，所以File既可能是文件也可能是目录**
+
+- **File和IO流没有继承关系，父类是Object**
+
+
+
+![image-20240918114549062](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409181145204.png)
+
+
+
+```java
+@Test
+public void fileTest() throws Exception{
+    File file = new File("e:\\data\\a\\b\\c");
+
+    /*        if (!file.exists()) {
+            file.createNewFile();
+        }*/
+
+    if (!file.exists()) {
+        file.mkdir();  // 适用一层目录
+    }
+
+    if (!file.exists()) {
+        file.mkdirs();  // 创建多层目录
+    }
+    System.out.println(file.getCanonicalPath());
+}
+```
+
+
+
+> **常用方法**
+
+- **delete**
+- **getAbsolutePath**
+- **getName**
+- **getParent**
+- **isAbsolute**
+- **isDirectory**
+- **isFile**
+- **isHidden**
+- **lastModified**     // 返回long值毫秒数，获取文件最后修改时间点
+- **length**  // 获取文件的总字节数（大小）
+- **rename**
+- **listFiles**
+
+
+
+
+
+
+
+
+
+## 筛选过滤后的文件
+
+![image-20240918141031054](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409181410207.png)
+
+
+
+> **File[] listFiles()**
+
+```java
+@Test
+public void fileTest() throws Exception{
+    File file = new File("E:\\Program Files");
+
+    // 获取所有的子文件包括子目录
+    File[] files = file.listFiles();
+
+    for(File f : files) {
+        System.out.println(f.getName());
+    }
+}
+```
+
+
+
+> **筛选**
+
+```java
+@Test
+public void fileTest() throws Exception{
+    File file = new File("E:\\Git\\Git");
+
+    // 获取所有的子文件包括子目录
+    File[] files = file.listFiles(new FilenameFilter() {
+        @Override
+        public boolean accept(File dir, String name) {
+            return name.endsWith(".exe");
+        }
+    });
+
+    for(File f : files) {
+        System.out.println(f.getName());
+    }
+}
+```
+
+
+
+
+
+## 目录的递归拷贝
+
+listFiles获取所有文件，递归调用进行判断文件类型去拷贝。
+
+```java
+@Test
+public void dirCopy() {
+    // 拷贝源
+    File src = new File("E:\\Fonts");
+    // 目标
+    File pos = new File("E:\\test\\a\\b");
+
+    // 获取拷贝源所有的文件及目录
+    copy(src, pos);
+
+}
+
+private void copy(File src, File pos) {
+    if(src.isFile()) {
+        // 如果是文件进行拷贝文件
+        try(FileInputStream in = new FileInputStream(src);
+            FileOutputStream out = new FileOutputStream(pos.getAbsolutePath() + src.getAbsolutePath().substring(2))) {
+
+            byte[] bytes = new byte[1024 * 1024];
+            int readCount = 0;
+            while ((readCount = in.read(bytes)) != -1) {
+                out.write(bytes, 0, readCount);
+            }
+
+            out.flush();
+        }catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } ;
+        return;
+    };
+
+    // 如果是目录进行拷贝目录
+    File newFile = new File(pos.getAbsolutePath() + src.getAbsolutePath().substring(2));
+    if (!newFile.exists()) {
+        newFile.mkdirs();
+    }
+
+    File[] files = src.listFiles();
+    for(File f : files) {
+        System.out.println(f.getAbsolutePath());
+        copy(f, pos);
+    }
+}
+```
+
+
+
+
+
+## 读取属性配置文件
+
+![image-20240918150934542](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409181509711.png)
+
+
+
+```java
+@Test
+public void propertiesTest() {
+
+    String path = Thread.currentThread()
+        .getContextClassLoader()
+        .getResource("jdbc.properties")
+        .getPath();
+
+    // pro.load需要Reader流或者InputStream流
+    Reader reader = null;
+    try {
+        reader = new FileReader(path);
+    } catch (FileNotFoundException e) {
+        throw new RuntimeException(e);
+    }
+
+    Properties pro = new Properties();
+    try {
+        pro.load(reader);
+    } catch (IOException e) {
+        throw new RuntimeException(e);
+    }
+
+    // 获取属性和值
+    // 1. 遍历
+    /*        Enumeration<?> enumeration = pro.propertyNames();
+        while (enumeration.hasMoreElements()) {
+            String names =(String) enumeration.nextElement();
+            String value = pro.getProperty(names);
+            System.out.println(names + "=" + value);
+        }*/
+
+    // 2. 获取需要的, 推荐这种
+    String user = pro.getProperty("user");
+    String password = pro.getProperty("password");
+    String url = pro.getProperty("url");
+
+    System.out.println(user);
+    System.out.println(password);
+    System.out.println(url);
+}
+```
+
+
+
+
+
+## ResourcesBundle资源绑定
+
+java.util.ResourcesBundle绑定属性配置文件
+
+
+
+```java
+@Test
+public void bundleProperties() {
+    // 获取资源绑定器   . 或者 / 都可以, 不要加后缀，当做类
+    // 从类根路径开始找
+    ResourceBundle bundle = ResourceBundle.getBundle("IOStream.jdbc");
+
+    String user = bundle.getString("user");
+    String password = bundle.getString("password");
+    String url = bundle.getString("url");
+
+    System.out.println(user);
+    System.out.println(password);
+    System.out.println(url);
+
+}
+```
+
+
+
+
+
+## 装饰器设计模式
+
+![image-20240918161247226](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409181612410.png)
+
+- **目标：在松耦合前提下，完成功能的扩展，代替继承防止类爆炸**
+- **在装饰器设计中，两个重要角色：装饰者与被装饰者**
+
+- **装饰器设计模式中，要求装饰者与被装饰者应实现同一个接口/同一些接口，继承同一个抽象类**
+
+- **因为实现同一个接口以后，对于客户端程序来说，使用装饰者时就像在使用被装饰者一样**
+- **装饰者中含有被装饰者的引用（A has a B），尽量使用has a[耦合度低一些]，不要使用is a**
+
+
+
+> **简易实现**
+
+```java
+package DecoratorTest;
+
+// 被装饰者
+
+public interface flyable {
+    void fly();
+}
+```
+
+```java
+package DecoratorTest;
+
+// 被装饰者
+
+public class Bird implements flyable{
+    @Override
+    public void fly() {
+        System.out.println("Bird fly...");
+    }
+}
+```
+
+```java
+package DecoratorTest;
+
+public class dog implements flyable{
+    @Override
+    public void fly() {
+        System.out.println("dog can't fly");
+    }
+}
+```
+
+```java
+package DecoratorTest;
+
+/**
+ *  装饰者
+ *  有一个被装饰者的引用。
+ *  这个引用最好是抽象的，不是具体的。
+ *  因为Bird和dog都实现了接口flyable。
+ *  因此这里的被装饰者引用，它的类型是flyable。
+ * */
+
+public class DecoratorFlyable implements flyable{
+
+    private flyable flyable;
+
+    public DecoratorFlyable(flyable flyable) {
+        this.flyable = flyable;
+    }
+
+    @Override
+    public void fly() {
+        // 完成对原功能的扩展
+        long start = System.currentTimeMillis();
+        flyable.fly();
+        long end = System.currentTimeMillis();
+        System.out.println("耗时：" + (end - start) + "毫秒");
+    }
+
+}
+```
+
+```java
+package DecoratorTest;
+
+
+public class DecoratorTest {
+    public static void main(String[] args) {
+
+        flyable f1 = new DecoratorFlyable(new Bird());
+        f1.fly();
+        flyable f2 = new DecoratorFlyable(new dog());
+        f2.fly();
+
+    }
+}
+```
+
+
+
+> **多个装饰器**
+
+```java
+// 被装饰者
+
+public interface flyable {
+    void fly();
+}
+```
+
+```java
+// 被装饰者
+
+public class Bird implements flyable{
+    @Override
+    public void fly() {
+        System.out.println("Bird fly...");
+    }
+}
+```
+
+```java
+public class dog implements flyable{
+    @Override
+    public void fly() {
+        System.out.println("dog can't fly");
+    }
+}
+```
+
+```java
+// 抽象装饰者类
+
+/**
+ *  装饰者
+ *  有一个被装饰者的引用。
+ *  这个引用最好是抽象的，不是具体的。
+ *  因为Bird和dog都实现了接口flyable。
+ *  因此这里的被装饰者引用，它的类型是flyable。
+ * */
+
+public abstract class DecoratorFlyable implements flyable{
+
+    private flyable flyable;
+
+    public DecoratorFlyable(flyable flyable) {
+        this.flyable = flyable;
+    }
+
+    @Override
+    public void fly() {
+        flyable.fly();
+    }
+
+}
+```
+
+```java
+// 装饰者实现类1
+
+public class TimeDecorator extends DecoratorFlyable{
+    public TimeDecorator(flyable flyable) {
+        super(flyable);
+    }
+
+    @Override
+    public void fly() {
+        long start = System.currentTimeMillis();
+        super.fly();
+        long end = System.currentTimeMillis();
+        System.out.println("fly time:"+(end-start));
+    }
+}
+```
+
+```java
+// 装饰者实现类2
+
+public class PreDecorotor extends DecoratorFlyable{
+    public PreDecorotor(flyable flyable) {
+        super(flyable);
+    }
+
+    @Override
+    public void fly() {
+        System.out.println("PreDecorotor");
+        super.fly();
+    }
+}
+```
+
+```java
+// 测试
+public class DecoratorTest {
+    public static void main(String[] args) {
+
+        flyable f1 = new PreDecorotor(new TimeDecorator(new Bird()));
+        f1.fly();
+
+    }
+}
+/*
+    PreDecorotor
+    Bird fly...
+    fly time:0
+*/
+```
+
+
+
+
 
 
 
