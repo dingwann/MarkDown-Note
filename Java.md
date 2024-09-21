@@ -6217,6 +6217,365 @@ public class Test {
 
 ![image-20240919155459337](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409191554559.png)
 
+- **进程和进程之间是独立的，内存不会共享**
+
+
+
+> **JVM规范**
+
+![image-20240920163219138](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409201632457.png)
+
+
+
+> **分析下面的线程**
+
+```java
+public class Test {
+    public static void main(String[] args) {
+        System.out.println("main begin");
+        m1();
+        System.out.println("main end");
+    }
+
+    public static void m1() {
+        System.out.println("m1 begin");
+        m2();
+        System.out.println("m1 end");
+    }
+
+    public static void m2() {
+        System.out.println("m2 begin");
+        m3();
+        System.out.println("m2 end");
+    }
+
+    public static void m3() {
+        System.out.println("m3 begin");
+        System.out.println("m3 end");
+    }
+}
+```
+
+- **启动了除GC线程外一个线程：main主线程**
+
+- **不是一个方法就是一个线程，main方法和其他方法都在一个虚拟机栈中依次压栈执行的**
+
+
+
+
+
+## 并发编程与并行编程
+
+![image-20240920180122609](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409201801813.png)
+
+
+
+
+
+![image-20240920180229830](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409201802937.png)
+
+
+
+
+
+![image-20240920181653733](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409201816960.png)
+
+
+
+
+
+## 线程调度模型
+
+![image-20240921111327800](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409211113074.png)
+
+
+
+> **Java采用的抢占式调度模型**
+
+
+
+## 实现线程的方式①
+
+- **编写一个类继承java.lang.Thread**
+- **重写run方法**
+- **new 线程对象**
+- **调用线程对象的start方法来启动线程**
+
+​	
+
+```java
+public class implementThread extends Thread{
+    @Override
+    public void run() {
+        for (int i = 0; i < 100; i++) {
+            System.out.println("MyThread" + i);
+        }
+    }
+}
+```
+
+```java
+public class Test {
+    public static void main(String[] args) {
+        // new线程对象
+        implementThread myThread = new implementThread();
+
+        // 启动线程, 开新的栈   run不会启动新线程, 只有run执行完所有的代码才执行下面的代码。
+        // start也得执行完才执行下面的，但是start方法栈帧目的是启动线程，开新的栈空间，执行很快，分配完该栈帧就结束。
+        myThread.start();
+
+        // 继续编写的代码属于main方法的在主线程中执行
+        for (int i = 0; i < 10000; i++) {
+            System.out.println("mainThread" + i);
+        }
+    }
+}
+```
+
+
+
+**start内存图：**
+
+![image-20240921114324712](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409211143845.png)
+
+![image-20240921115148194](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409211151344.png)
+
+
+
+
+
+------
+
+
+
+**run方法内存图**
+
+![image-20240921114441071](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409211144167.png)
+
+![image-20240921114353636](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409211143734.png)
+
+
+
+
+
+## 实现线程的方式②
+
+- **编写类实现java.lang.Runnable接口（可运行的接口）**
+- **实现接口中的run方法**
+- **new 线程对象**
+- **启动start方法**
+- **它是普通的类，只不过实现了Runnable接口，并不是线程类**
+
+
+
+```java
+// 不是线程类，普通类，实现了Runnable接口而已
+
+public class ImplementThread2 implements Runnable{
+    @Override
+    public void run() {
+        for (int i = 0; i < 100; i++) {
+            System.out.println("t ------> " + i);
+        }
+    }
+}
+
+```
+
+```java
+public class Test {
+    public static void main(String[] args) {
+        // 创建Runnable对象
+        Runnable r = new ImplementThread2();
+        // new线程对象
+        Thread t = new Thread(r);
+        
+        // Thread t = new Thread(new ImplementThread2());
+
+        // 启动线程, 开新的栈
+        t.start();
+
+        // 继续编写代码属于main方法的在主线程中执行
+        for (int i = 0; i < 100; i++) {
+            System.out.println("mainThread" + i);
+        }
+    }
+}
+
+```
+
+![image-20240921120423228](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409211204353.png)
+
+
+
+> **更推荐第二种方式，可扩展性更高，保留了类的继承**
+
+
+
+> **匿名内部类的方式实现**
+
+```java
+public class Test {
+    public static void main(String[] args) {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < 100; i++) {
+                    System.out.println("Mythread" + i);
+                }
+            }
+        });
+
+        t.start();
+        
+        /*  
+        	new Thread(new Runnable() {
+            	@Override
+                public void run() {
+                    // ...
+                }
+        	}).start();
+        */
+
+        for (int i = 0; i < 100; i++) {
+            System.out.println("mainThread" + i);
+        }
+    }
+}
+
+```
+
+![image-20240921120854527](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409211208670.png)
+
+
+
+
+
+## 线程常用的三个方法
+
+> **实例方法**
+
+```java
+// String getName();   获取线程对象的名字
+// void setName(String threadName);   给线程起名字   
+```
+
+
+
+> **静态方法**
+
+```java
+//static Thread  -- currentThread();   // 获取当前的线程对象的引用（地址）
+```
+
+
+
+```java
+public class implementThread extends Thread{
+    @Override
+    public void run() {
+        for (int i = 0; i < 100; i++) {
+            System.out.println("MyThread" + i);
+        }
+
+        Thread thread = Thread.currentThread();
+        System.out.println(thread.getName());   // Thread-0
+    }
+}
+```
+
+```java
+public class Test {
+    public static void main(String[] args) {
+        Thread t = new implementThread();
+
+        t.start();
+
+        System.out.println(Thread.currentThread().getName());  // main
+    }
+}
+```
+
+
+
+
+
+
+
+## 线程的生命周期
+
+**Thread.State ----> enum类型**
+
+- **1. NEW**
+
+​        新建状态
+
+- **2. RUNNABLE**
+
+​        可运行状态
+
+​        细分分为两个子状态：
+
+​                2.1 就绪状态
+
+​                2.2 运行状态
+
+- **3. BLOCKED**
+
+​        阻塞状态
+
+​                遇到锁之后进入锁状态（什么是锁）
+
+- **4. WAITING**
+
+​        等待状态
+
+​                 无期限的等待，没有时长限定。
+
+- **5. TIMED_WAITING**
+
+​        超时等待状态
+
+​                 该状态有时长限定 
+
+- **6. TERMINATED**
+
+​        终止状态（死亡状态）
+
+
+
+> **面试时，线程的生命周期说7个状态**
+
+1. 新建状态
+2. 就绪状态
+3. 运行状态
+4. 超时等待状态
+5. 等待状态
+6. 阻塞状态
+7. 终止状态
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
