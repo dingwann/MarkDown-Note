@@ -6504,6 +6504,10 @@ public class Test {
 
 ## 线程的生命周期
 
+![image-20240922113036001](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409221130137.png)
+
+
+
 **Thread.State ----> enum类型**
 
 - **1. NEW**
@@ -6556,6 +6560,248 @@ public class Test {
 
 
 
+![image-20240923145639339](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409231456519.png)
+
+
+
+
+
+## 线程的休眠
+
+静态方法 sleep()：
+
+```java
+static void sleep(long millis)
+```
+
+静态方法，没有返回值。
+
+**作用：**
+
+​			**让当前线程进入休眠，也就是让当前线程放弃占有的CPU时间片，让其进入阻塞状态。**
+
+​			**阻塞参数毫秒时长，指定时间内当前线程没有权限抢夺CPU时间片**
+
+```java
+public class Test {
+    public static void main(String[] args) {
+        try {
+            Thread.sleep(1000 * 5);  // 当前线程主线程休眠5秒
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        for (int i = 0; i < 10; i++) {
+            System.out.println("---->" + i);
+        }
+    }
+}
+
+```
+
+
+
+> **sleep面试题**
+
+下面让main休眠还是t线程？
+
+```java
+public class ImplementThread2 implements Runnable{
+    @Override
+    public void run() {
+        for (int i = 0; i < 100; i++) {
+            System.out.println("t ------> " + i);
+        }
+    }
+}
+```
+
+```java
+public class Test {
+    public static void main(String[] args) {
+
+        Thread t = new Thread(new ImplementThread2());
+        t.setName("t");
+        t.start();
+
+        try {
+            t.sleep(1000 * 5);   // 等同于Thread.sleep()
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        for (int i = 0; i < 10; i++) {
+            System.out.println("main----> " + i);
+        }
+    }
+}
+```
+
+休眠的是主线程
+
+
+
+
+
+## 中断线程的阻塞
+
+解除线程因sleep导致的阻塞，让其开始抢夺时间片。
+
+
+
+> **xxx.interrupt();   // 实例方法, 利用了异常机制**
+
+```java
+public class Test {
+    public static void main(String[] args) {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println(Thread.currentThread().getName() + " ----> begin");
+                try {
+                    Thread.sleep(1000 * 60 * 60 * 24 * 365);  // 休眠365天
+                } catch (InterruptedException e) {
+                    e.printStackTrace();   // java.lang.InterruptedException: sleep interrupted
+                }
+
+                // 休眠后执行的代码
+                System.out.println(Thread.currentThread().getName() + " ----> do some");
+            }
+        });
+
+        t.start();
+
+        // 主线程
+        // Thread-0线程原本休眠一年, 我要求5秒后就起来干活
+        try {
+            Thread.sleep(1000 * 5);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Thread-0起来干活
+        t.interrupt();   // 打扰干扰的意思, 立即让Thread-0抛异常, 异常抛出后try-catch立即结束, 于是结束休眠, 利用了异常处理机制。
+    }
+}
+
+```
+
+
+
+
+
+## 终止线程的执行
+
+> **一个线程t一直在运行，实际中我们会用打标记的方式进行终止**
+
+
+
+```java
+public class ImplementThread2 implements Runnable{
+    boolean run = true;
+
+    @Override
+    public void run() {
+        for (int i = 0; i < 100; i++) {
+            if(run) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(Thread.currentThread().getName() + "------> " + i);
+            }else {
+                return;
+            }
+        }
+    }
+}
+
+```
+
+```java
+public class Test {
+    public static void main(String[] args) {
+
+        ImplementThread2 mr = new ImplementThread2();
+        Thread t = new Thread(mr);
+
+        t.setName("t");
+        t.start();
+
+        // 5s后终止
+        try {
+            Thread.sleep(1000 * 5);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        mr.run = false;
+
+    }
+}
+```
+
+
+
+
+
+## 守护线程
+
+> **在Java中线程被分为两大类，一类是用户线程（非守护线程），一类是守护线程（后台线程）**
+
+之前的内容就是用户线程
+
+在JVM中，有一个隐藏的守护线程一直在守护着，就是GC线程
+
+守护线程的特点：所有的用户线程结束后，守护线程自动退出/结束
+
+
+
+```java
+public class Test {
+    public static void main(String[] args) {
+        Thread myThread = new MyThread();
+        myThread.setName("t");
+
+        // 设置为守护线程
+        myThread.setDaemon(true);
+
+        myThread.start();
+
+        // main线程10s结束
+        for (int i = 0; i < 10; i++) {
+            System.out.println(Thread.currentThread().getName() + " ----> " + i);
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+
+    }
+}
+
+
+class MyThread extends Thread {
+    @Override
+    public void run() {
+        int i = 0;
+        for (; i < 100; i++) {
+            System.out.println(Thread.currentThread().getName() + " ----> " + i);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+}
+```
+
+- **守护线程就是为用户线程服务的**
 
 
 
@@ -6563,10 +6809,467 @@ public class Test {
 
 
 
+## 定时任务
+
+- **java.util.Timer**
+
+![image-20240923140719560](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409231407711.png)
+
+![image-20240923140731864](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409231407969.png)
+
+
+
+```java
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimerTask;
+
+public class LogTimerTask extends TimerTask {
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS");
+    int count;
+
+    @Override
+    public void run() {
+        Date date = new Date();
+        String sdfTime = sdf.format(date);
+        System.out.println(sdfTime + ": " + count++);
+    }
+}
+```
+
+```java
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Timer;
+
+/**
+ * JDK提供的类库：（真实开发中也不用，后面框架封装了）
+ * java.util.Timer       // 定时器
+ * java.util.TimerTask   // 定时任务
+ * 定时器 + 定时任务 == 间隔xxx执行一次定时任务
+ * */
+public class Test {
+    public static void main(String[] args) {
+        // 创建定时器对象(本质上就是一个线程)
+        // 如果该线程是后台任务，建议设置为守护线程
+        Timer timer = new Timer(true);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS");
+        Date firstTime = null;
+        try {
+            firstTime = sdf.parse("2024-9-23 14:23:00 000");
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        // 指定定时任务
+        timer.schedule(new LogTimerTask(), firstTime, 1000);
+    }
+}
+```
+
+- **LogTimerTask也可以采用匿名内部类的方式传入schedule**
 
 
 
 
+
+## 线程合并
+
+> **1. 调用join()完成线程合并**
+>
+> **2. join()是一个实例方法**
+>
+> **3. 假设在main方法（main线程）中调用了t.join()，后果是什么？**
+>
+> ​		**t 线程合并到主线程中，主线程进行阻塞状态，直到 t 线程执行结束，主线程阻塞结束**
+>
+> **4. t.join()作用就是让当前线程进入阻塞状态，直到 t 线程执行结束，当前线程阻塞解除（阻塞当前线程，先完成 t 线程的活）**
+>
+> **5. 和sleep方法有点类似，但不一样：**
+>
+> ​		**sleep是静态方法，join是实例**
+>
+> ​		**sleep可以指定阻塞的时长，join不能保证**
+>
+> ​		**sleep和join都是让当前线程进入阻塞**
+>
+> ​       **sleep阻塞结束是时间结束，join阻塞结束是调用方法的线程执行结束了**
+
+
+
+```java
+public class joinThread {
+    public static void main(String[] args) {
+        Thread myThread = new MyThread();
+        myThread.setName("t");
+
+        myThread.start();
+
+        System.out.println("main begin");
+
+        try {
+            // join也可以指定预计时间毫秒, 但是和sleep不一样, 指定的时间代表只合并多少秒, 但是不一定，如果指定时间内线程就结束了那阻塞也立即结束。
+            // myThread.join(8);  合并8毫秒
+            myThread.join(8);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        for (int i = 0; i < 100; i++) {
+            System.out.println(Thread.currentThread().getName() + "----> " + i);
+        }
+
+        System.out.println("main end");
+    }
+}
+
+class MyThread extends Thread {
+
+    @Override
+    public void run() {
+        for (int i = 0; i < 100; i++) {
+            System.out.println(Thread.currentThread().getName() + " ----> " + i);
+        };
+    }
+}
+```
+
+
+
+
+
+## 线程的优先级
+
+> **关于线程生命周期中的JVM调度**
+>
+> ​		**1. 优先级**
+>
+> ​		**2. 线程是可以设置优先级的，优先级高的，获得CPU时间片的总体概率高一些**
+>
+> ​		**3. Java采用的抢占式调度模型，优先级高，获得CPU时间片的总体概率就高**
+>
+> ​		**4. 默认情况下，一个线程的优先级是 5**
+>
+> ​		**5. 最低是 1，最高是 10**
+
+
+
+```java
+public class PriorityThread {
+    public static void main(String[] args) {
+        System.out.println("线程最低优先级：" + Thread.MIN_PRIORITY);
+        System.out.println("线程最高优先级：" + Thread.MAX_PRIORITY);
+        System.out.println("线程默认优先级：" + Thread.NORM_PRIORITY);
+    }
+}
+```
+
+![image-20240923150159609](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409231501696.png)
+
+
+
+- **main线程优先级**
+
+```java
+public class PriorityThread {
+    public static void main(String[] args) {
+        // 获取main线程优先级
+        Thread mainThread = Thread.currentThread();
+        System.out.println(mainThread.getPriority());  // 5
+    }
+}
+```
+
+
+
+> **设置优先级方法**
+
+```java
+public class PriorityThread {
+    public static void main(String[] args) {
+        // 获取main线程优先级
+        Thread mainThread = Thread.currentThread();
+        System.out.println(mainThread.getPriority());  // 5
+
+        // 更改线程优先级, main线程为例
+        mainThread.setPriority(10);
+        System.out.println(mainThread.getPriority());  // 10
+    }
+}
+```
+
+
+
+
+
+## 线程让位
+
+> **关于JVM的调度：**
+>
+> ​		**1. 让位**
+>
+> ​		**2. 静态方法：Thread.yield()**
+>
+> ​		**3. 让当前线程让位**
+>
+> ​		**4. 注意：让位不会让当前线程进入阻塞状态。只是放弃目前占有的时间片，让其进入就绪状态，继续抢夺时间片**
+>
+> ​		**5. 只能保证大方向上的，大概率，到了某个点让位一次**
+
+
+
+```java
+public class yieldThread {
+    public static void main(String[] args) {
+        Thread t1 = new MyThread2();
+        t1.setName("t1");
+        Thread t2 = new MyThread2();
+        t1.setName("t2");
+
+        t1.start();
+        t2.start();
+    }
+}
+
+
+class MyThread2 extends Thread {
+    @Override
+    public void run() {
+        for (int i = 0; i < 200; i++) {
+            System.out.println(Thread.currentThread().getName() + " ----> " + i);
+            if(Thread.currentThread().getName().equals("t2") && i % 10 == 0) {
+                System.out.println(Thread.currentThread().getName() + "让位了" + "当前i：" + i);
+                Thread.yield();
+            }
+        }
+    }
+}
+```
+
+
+
+
+
+
+
+## 线程安全问题
+
+> **什么情况需要考虑线程安全？**
+>
+> ​	**1. 多线程的并发环境下**
+>
+> ​	**2. 有共享的数据**
+>
+> ​	**3. 共享数据涉及到修改操作**
+>
+> **一般情况下： 局部变量不存在线程安全问题[在栈中，栈是私有的]。（尤其是基本数据类型，引用数据类型另说）**
+>
+> ​								**实例变量存在线程安全，实例变量在堆中。堆是多线程共享的**
+>
+> ​								**静态变量也可能存在，因为静态变量在堆中。堆是多线程共享的**
+
+
+
+![image-20240923164117317](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409231641497.png)
+
+- 让线程不要并发进行排队执行，叫做**线程同步机制**
+
+- 不排队，就是并发，叫做**线程异步机制**
+
+![image-20240923171927978](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409231719128.png)
+
+
+
+
+
+> **演示线程安全问题**
+
+
+
+```java
+public class synchronizedTest {
+    public static void main(String[] args) {
+        User user = new User("wc", 10000);
+
+        Thread t1 = new Thread(new Withdraw(user));
+        Thread t2 = new Thread(new Withdraw(user));
+
+        t1.start();
+        t2.start();
+    }
+}
+
+
+class Withdraw implements Runnable {
+    User user;
+
+    public Withdraw(User user) {
+        this.user = user;
+    }
+
+    @Override
+    public void run() {
+        this.user.QuKuan(1000);
+    }
+}
+
+class User {
+    private String userNo;
+    private int money;
+
+    public User(String userNo, int money) {
+        this.userNo = userNo;
+        this.money = money;
+    }
+
+    public String getUserNo() {
+        return userNo;
+    }
+
+    public void setUserNo(String userNo) {
+        this.userNo = userNo;
+    }
+
+    public int getMoney() {
+        return money;
+    }
+
+    public void setMoney(int money) {
+        this.money = money;
+    }
+
+    public void QuKuan(int money) {
+        System.out.println(Thread.currentThread().getName() + "取款操作中" + money + "账户当前余额: " + this.getMoney());
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        // 取
+        this.setMoney(this.getMoney() - money);
+
+        System.out.println(Thread.currentThread().getName() + "取款完成" + "余额为：" + this.getMoney());
+    }
+
+```
+
+![image-20240923175224383](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409231752512.png)
+
+
+
+
+
+## 同步代码块
+
+> **同步代码块**
+
+
+
+```java
+/**
+ * 使用线程同步机制来保证多线程并发下的数据安全问题
+ * 1.线程同步的本质：线程排队执行
+ * 2.语法格式：
+ *      synchronized(必须是需要排队的这几个线程共享的对象) {
+ *          // 需要同步的代码
+ *      }
+ *
+ * 必须是需要排队的这几个线程共享的对象：必须选对，不然会无辜增加同步数量，导致效率变低。
+ *
+ * 3.原理：
+ *      synchronized(obj) {
+ *          // 同步代码块
+ *      }
+ *      假设obj是 t1 和 t2 两个线程共享的。
+ *      t1和 t2一定会有一个先抢到CPU时间片, 一定有先后顺序。
+ *      假设 t1 先抢到CPU时间片, 那 t1 线程找共享对象obj的对象锁, 找到后则占用这把锁。
+ *      只要能够占有obj对象的对象锁, 就有权力进入同步代码块执行。
+ *      当 t1 线程执行完同步代码块后, 会释放之前占有的对象锁（归还锁）
+ *      同样, t2 线程抢到CPU时间片后, 也开始执行, 也会去找共享对象obj的对象锁, 但由于 t1 占有, t2线程只能在同步代码块外等待。
+ *      同步代码块范围也不要无辜扩大
+ * */
+
+public class synchronizedTest {
+    public static void main(String[] args) {
+        User user = new User("wc", 10000);
+
+        Thread t1 = new Thread(new Withdraw(user));
+        Thread t2 = new Thread(new Withdraw(user));
+
+        t1.start();
+        t2.start();
+    }
+}
+
+
+class Withdraw implements Runnable {
+    User user;
+
+    public Withdraw(User user) {
+        this.user = user;
+    }
+
+    @Override
+    public void run() {
+        this.user.QuKuan(1000);
+    }
+}
+
+class User {
+    private String userNo;
+    private int money;
+
+    public User(String userNo, int money) {
+        this.userNo = userNo;
+        this.money = money;
+    }
+
+    public String getUserNo() {
+        return userNo;
+    }
+
+    public void setUserNo(String userNo) {
+        this.userNo = userNo;
+    }
+
+    public int getMoney() {
+        return money;
+    }
+
+    public void setMoney(int money) {
+        this.money = money;
+    }
+
+    public void QuKuan(int money) {
+        // 当前对象this就是t1 和 t2 共享的对象
+        synchronized (this) {
+            System.out.println(Thread.currentThread().getName() + "取款操作中" + money + "账户当前余额: " + this.getMoney());
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            // 取
+            this.setMoney(this.getMoney() - money);
+
+            System.out.println(Thread.currentThread().getName() + "取款完成" + "余额为：" + this.getMoney());
+        }
+    }
+}
+```
+
+![image-20240923180813963](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409231808099.png)
+
+
+
+
+
+## 同步实例方法
 
 
 
