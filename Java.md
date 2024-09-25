@@ -6578,7 +6578,7 @@ static void sleep(long millis)
 
 **作用：**
 
-​			**让当前线程进入休眠，也就是让当前线程放弃占有的CPU时间片，让其进入阻塞状态。**
+​			**让当前线程进入休眠，也就是让当前线程放弃占有的CPU时间片，让其进入阻塞状态，如果占有对象锁不会放弃对象锁**
 
 ​			**阻塞参数毫秒时长，指定时间内当前线程没有权限抢夺CPU时间片**
 
@@ -6637,7 +6637,7 @@ public class Test {
 }
 ```
 
-休眠的是主线程
+- ***休眠的是主线程***
 
 
 
@@ -6754,9 +6754,13 @@ public class Test {
 
 在JVM中，有一个隐藏的守护线程一直在守护着，就是GC线程
 
-守护线程的特点：所有的用户线程结束后，守护线程自动退出/结束
+**守护线程的特点：所有的用户线程结束后，守护线程自动退出/结束**
+
+ **main线程默认是用户线程**
 
 
+
+``xxx.setDaemon(true);``
 
 ```java
 public class Test {
@@ -6766,7 +6770,8 @@ public class Test {
 
         // 设置为守护线程
         myThread.setDaemon(true);
-
+		
+        // 设置完后再启动线程
         myThread.start();
 
         // main线程10s结束
@@ -6853,7 +6858,7 @@ public class Test {
     public static void main(String[] args) {
         // 创建定时器对象(本质上就是一个线程)
         // 如果该线程是后台任务，建议设置为守护线程
-        Timer timer = new Timer(true);
+        Timer timer = new Timer(true);  // 设置为守护线程
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS");
         Date firstTime = null;
@@ -6958,9 +6963,9 @@ class MyThread extends Thread {
 ```java
 public class PriorityThread {
     public static void main(String[] args) {
-        System.out.println("线程最低优先级：" + Thread.MIN_PRIORITY);
-        System.out.println("线程最高优先级：" + Thread.MAX_PRIORITY);
-        System.out.println("线程默认优先级：" + Thread.NORM_PRIORITY);
+        System.out.println("线程最低优先级：" + Thread.MIN_PRIORITY);  // 1
+        System.out.println("线程最高优先级：" + Thread.MAX_PRIORITY);  // 10
+        System.out.println("线程默认优先级：" + Thread.NORM_PRIORITY); // 5
     }
 }
 ```
@@ -7270,6 +7275,781 @@ class User {
 
 
 ## 同步实例方法
+
+> **在实例方法上也可以添加synchronized修饰符 == 整个方法是同步代码块，但是方法上添加共享对象的对象锁一定是this对象**
+
+
+
+```java
+public synchronized void QuKuan(int money) {
+    // 当前对象this就是t1 和 t2 共享的对象
+    System.out.println(Thread.currentThread().getName() + "取款操作中" + money + "账户当前余额: " + this.getMoney());
+
+    try {
+        Thread.sleep(1000);
+    } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+    }
+
+    // 取
+    this.setMoney(this.getMoney() - money);
+
+    System.out.println(Thread.currentThread().getName() + "取款完成" + "余额为：" + this.getMoney());
+
+}
+```
+
+- **恰好共享对象是this和整个方法体都是同步代码块时这样用**
+
+
+
+
+
+
+
+## 同步机制面试题
+
+**1. **
+
+```java
+/**
+ * m2在执行时需不需要等待m1的结束？
+ * */
+public class PreThreadTest {
+    public static void main(String[] args) {
+        MyClass mc = new MyClass();
+        Thread t1 = new Thread(new MyRunnable(mc));
+        Thread t2 = new Thread(new MyRunnable(mc));
+
+        t1.setName("t1");
+        t2.setName("t2");
+
+        t1.start();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        t2.start();
+    }
+}
+
+
+class MyRunnable implements Runnable {
+    private MyClass mc;
+
+    public MyRunnable(MyClass mc) {
+        this.mc = mc;
+    }
+
+    @Override
+    public void run() {
+        if(Thread.currentThread().getName().equals("t1")) {
+            mc.m1();
+        }
+        if (Thread.currentThread().getName().equals("t2")) {
+            mc.m2();
+        }
+    }
+}
+
+class MyClass {
+    public synchronized void m1() {
+        System.out.println("m1 begin");
+
+        try {
+            Thread.sleep(1000 * 5);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println("m1 over");
+    }
+
+    public void m2() {
+        System.out.println("m2 begin");
+        System.out.println("m2 over");
+    }
+}
+```
+
+![image-20240924105204521](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409241052707.png)
+
+
+
+> **m2的执行不需要等待m1的结束，因为m2没有synchronized修饰，不需要找对象锁**
+
+
+
+**2.**
+
+```java
+public class PreThreadTest {
+    public static void main(String[] args) {
+        MyClass mc = new MyClass();
+        Thread t1 = new Thread(new MyRunnable(mc));
+        Thread t2 = new Thread(new MyRunnable(mc));
+
+        t1.setName("t1");
+        t2.setName("t2");
+
+        t1.start();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        t2.start();
+    }
+}
+
+
+class MyRunnable implements Runnable {
+    private MyClass mc;
+
+    public MyRunnable(MyClass mc) {
+        this.mc = mc;
+    }
+
+    @Override
+    public void run() {
+        if(Thread.currentThread().getName().equals("t1")) {
+            mc.m1();
+        }
+        if (Thread.currentThread().getName().equals("t2")) {
+            mc.m2();
+        }
+    }
+}
+
+class MyClass {
+    public synchronized void m1() {
+        System.out.println("m1 begin");
+
+        try {
+            Thread.sleep(1000 * 5);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println("m1 over");
+    }
+
+    public synchronized void m2() {
+        System.out.println("m2 begin");
+        System.out.println("m2 over");
+    }
+}
+```
+
+![image-20240924105436420](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409241054513.png)
+
+
+
+
+
+**3. **
+
+```java
+/**
+ * m2在执行时需不需要等待m1的结束？
+ * */
+public class PreThreadTest {
+    public static void main(String[] args) {
+        MyClass mc1 = new MyClass();
+        MyClass mc2 = new MyClass();
+        Thread t1 = new Thread(new MyRunnable(mc1));
+        Thread t2 = new Thread(new MyRunnable(mc2));
+
+        t1.setName("t1");
+        t2.setName("t2");
+
+        t1.start();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        t2.start();
+    }
+}
+
+
+class MyRunnable implements Runnable {
+    private MyClass mc;
+
+    public MyRunnable(MyClass mc) {
+        this.mc = mc;
+    }
+
+    @Override
+    public void run() {
+        if(Thread.currentThread().getName().equals("t1")) {
+            mc.m1();
+        }
+        if (Thread.currentThread().getName().equals("t2")) {
+            mc.m2();
+        }
+    }
+}
+
+class MyClass {
+    public synchronized void m1() {
+        System.out.println("m1 begin");
+
+        try {
+            Thread.sleep(1000 * 5);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println("m1 over");
+    }
+
+    public synchronized void m2() {
+        System.out.println("m2 begin");
+        System.out.println("m2 over");
+    }
+}
+```
+
+![image-20240924105702331](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409241057428.png)
+
+
+
+> **不需要等待m1结束，因为两个线程持有的对象锁不一致**
+
+
+
+
+
+**4. **
+
+> **synchronized出现在static方法上，线程同步会找类锁**
+>
+> **不管创建多少对象，类锁只有一把，因为类只有一个类**
+
+
+
+```java
+/**
+ * m2在执行时需不需要等待m1的结束？
+ * */
+public class PreThreadTest {
+    public static void main(String[] args) {
+        MyClass mc1 = new MyClass();
+        MyClass mc2 = new MyClass();
+        Thread t1 = new Thread(new MyRunnable(mc1));
+        Thread t2 = new Thread(new MyRunnable(mc2));
+
+        t1.setName("t1");
+        t2.setName("t2");
+
+        t1.start();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        t2.start();
+    }
+}
+
+
+class MyRunnable implements Runnable {
+    private MyClass mc;
+
+    public MyRunnable(MyClass mc) {
+        this.mc = mc;
+    }
+
+    @Override
+    public void run() {
+        if(Thread.currentThread().getName().equals("t1")) {
+            mc.m1();
+        }
+        if (Thread.currentThread().getName().equals("t2")) {
+            mc.m2();
+        }
+    }
+}
+
+class MyClass {
+    public static synchronized void m1() {
+        System.out.println("m1 begin");
+
+        try {
+            Thread.sleep(1000 * 5);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println("m1 over");
+    }
+
+    public static synchronized void m2() {
+        System.out.println("m2 begin");
+        System.out.println("m2 over");
+    }
+}
+```
+
+![image-20240924110118829](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409241101926.png)
+
+
+
+> **需要等待，因为静态方法线程同步找类锁，只有一把类锁会排队**
+
+
+
+**总结：**
+
+- **静态方法添加synchronized实际是为了保障静态变量的安全**
+- **实例方法添加synchronized实际是为了保障实例变量的安全**
+
+
+
+
+
+## 死锁
+
+![image-20240924111306086](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409241113198.png)
+
+> **t1先拿到o1的对象锁然后向下执行拿o2**
+>
+> **t2先拿到o2的对象锁然后向上执行拿o1**
+>
+> **此时会出现t1先拿到o1对象锁，t2先拿到o2对象锁，这时两个线程都想拿对方的对象锁，又不肯释放自己手里的锁，就会进入死锁状态**
+
+
+
+**示例：**
+
+```java
+public class DeadlockExample {
+    public static void main(String[] args) {
+        Object resource1 = new Object();
+        Object resource2 = new Object();
+
+        // Thread 1
+        Thread t1 = new Thread(() -> {
+            synchronized (resource1) {
+                System.out.println("Thread 1: Locked resource 1");
+
+                try {
+                    Thread.sleep(100); // 模拟其他操作，增加死锁的可能性
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                synchronized (resource2) {
+                    System.out.println("Thread 1: Locked resource 2");
+                }
+            }
+        });
+
+        // Thread 2
+        Thread t2 = new Thread(() -> {
+            synchronized (resource2) {
+                System.out.println("Thread 2: Locked resource 2");
+
+                try {
+                    Thread.sleep(100); // 模拟其他操作，增加死锁的可能性
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                synchronized (resource1) {
+                    System.out.println("Thread 2: Locked resource 1");
+                }
+            }
+        });
+
+        // Start the threads
+        t1.start();
+        t2.start();
+    }
+}
+```
+
+
+
+## 线程生命周期（7种）
+
+官方给的6个，7个是将Runnable细分为了就绪和运行
+
+![image-20240923145639339](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409241250037.png)
+
+
+
+
+
+
+
+## 多线程卖票问题
+
+```java
+/**
+ * 模拟三个窗口卖票
+ * */
+public class SellTicket {
+    public static void main(String[] args) {
+
+        MyRunnable mr = new MyRunnable();
+        Thread t1 = new Thread(mr);
+        Thread t2 = new Thread(mr);
+        Thread t3 = new Thread(mr);
+        t1.setName("1");
+        t2.setName("2");
+        t3.setName("3");
+
+        t1.start();
+        t2.start();
+        t3.start();
+
+    }
+}
+
+
+class MyRunnable implements Runnable {
+
+    private int ticketTotal = 100;
+
+    @Override
+    public void run() {
+        // 实现卖票业务
+        while(true) {
+            // synchronized 线程同步机制
+            // synchronized 又叫互斥锁
+            synchronized (this) {
+                if(this.ticketTotal <= 0) {
+                    System.out.println("票已售空");
+                    break;
+                }
+
+                // 模拟出票
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                System.out.println("窗口" + Thread.currentThread().getName() + "售出一张票，还剩" + (--ticketTotal) + "张票");
+            }
+        }
+    }
+}
+```
+
+
+
+
+
+
+
+## 线程通信的三个方法
+
+![image-20240924133046088](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409241330300.png)
+
+![image-20240924134454904](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409241344059.png)
+
+- **obj.wait()调用了，会释放之前占有的对象锁**
+
+- **共享对象.notify()，调用后唤醒优先级最高的等待线程，如果优先级一样，则随机唤醒一个。**
+
+
+
+``两个线程要求交替输出1-100``
+
+```java
+public class ThreadTest {
+    public static void main(String[] args) {
+        MyRunnable22 mr = new MyRunnable22();
+        Thread t1 = new Thread(mr);
+        Thread t2 = new Thread(mr);
+
+        t1.setName("t1");
+        t2.setName("t2");
+
+        t1.start();
+        t2.start();
+
+    }
+}
+
+class MyRunnable22 implements Runnable {
+
+    private int count = 0;
+
+    @Override
+    public void run() {
+        while(true) {
+            synchronized (this) {
+                // 唤醒被等待的线程
+                // 这里唤醒了也不会执行，因为对象锁被另外个线程占有了
+                this.notify();
+
+                if(count >= 100) break;
+                // 模拟延迟
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                System.out.println(Thread.currentThread().getName() + " ----> " + (++count));
+
+                try {
+                    // 这里进入等待状态的可能是t1 也可能是t2
+                    // 进入的无期限等待状态，并且等待的时候不占用对象锁
+                    this.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}
+```
+
+- **同步代码块里的共享对象要和synchronized()里的保持一致**
+
+
+
+
+
+``实现三个线程交替输出``
+
+> **题目：**
+>
+> **按以下顺序**
+>
+> **t1 --> A**
+>
+> **t2 --> B**
+>
+> **t3 --> C**
+>
+> **...**
+>
+> **t1 --> A**
+>
+> **t2 --> B**
+>
+> **t3 --> C**
+>
+> **总共十组**
+
+```java
+public class ThreadTest {
+
+    private static Object lock = new Object();
+
+    private static boolean t1Output = true;
+    private static boolean t2Output = false;
+    private static boolean t3Output = false;
+
+    public static void main(String[] args) {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized(lock) {
+                    for (int i = 0; i < 10; i++) {
+                        while (!t1Output) {
+                            try {
+                                lock.wait();
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+
+                        System.out.println(Thread.currentThread().getName() + " ----> A");
+
+                        t1Output = false;
+                        t2Output = true;
+                        t3Output = false;
+
+                        // 唤醒所有线程
+                        lock.notifyAll();
+                    }
+                }
+            }
+        }).start();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized(lock) {
+                    for (int i = 0; i < 10; i++) {
+                        while (!t2Output) {
+                            try {
+                                lock.wait();
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+
+                        System.out.println(Thread.currentThread().getName() + " ----> B");
+
+                        t1Output = false;
+                        t2Output = false;
+                        t3Output = true;
+
+                        // 唤醒所有线程
+                        lock.notifyAll();
+                    }
+                }
+            }
+        }).start();
+
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized(lock) {
+                    for (int i = 0; i < 10; i++) {
+                        while (!t3Output) {
+                            try {
+                                lock.wait();
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+
+                        System.out.println(Thread.currentThread().getName() + " ----> C");
+
+                        t1Output = true;
+                        t2Output = false;
+                        t3Output = false;
+
+                        // 唤醒所有线程
+                        lock.notifyAll();
+                    }
+                }
+            }
+        }).start();
+    }
+}
+```
+
+
+
+
+
+
+
+## 总结线程通信
+
+``线程完整的生命周期``
+
+![image-20240924192502095](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409241925274.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
