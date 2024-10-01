@@ -1491,6 +1491,8 @@ Ctrl + o == 重写方法
 
 变量名.castvar == 快速向下转型并生成变量名
 
+Ctrl + Alt + T == 代码包围
+
 
 
 ## 面向对象（得精通）
@@ -7957,6 +7959,365 @@ public class ThreadTest {
 
 
 
+## 懒汉式单例模式线程安全问题
+
+```java
+public class SingletonTest {
+
+    private static Singleton s1 = null;
+    private static Singleton s2 = null;
+
+    public static void main(String[] args) {
+
+        // 线程对象1
+        Thread t1 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                s1 = Singleton.getSingleton();
+            }
+        });
+
+        // 线程对象2
+        Thread t2 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                s2 = Singleton.getSingleton();
+            }
+        });
+
+        // 该方法只是启动线程，瞬间就结束了，run还没来得及结束，主线程就会执行下面的代码
+        t1.start();
+        t2.start();
+
+        // 因为run还没执行，所以下面都是null和true
+        System.out.println(s1);
+        System.out.println(s2);
+        System.out.println(s1 == s2);
+
+    }
+}
+
+
+// 懒汉式单例模式
+class Singleton {
+
+    private static Singleton singleton = null;
+
+    private Singleton() {
+    }
+
+    public static Singleton getSingleton() {
+        if(singleton == null) singleton = new Singleton();
+        return singleton;
+    }
+}
+```
+
+![image-20240925112606603](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409251126784.png)
+
+
+
+``要么让主线程sleep要么用join方法阻塞主线程``
+
+```java
+try {
+    t1.join();
+} catch (InterruptedException e) {
+    throw new RuntimeException(e);
+}
+
+try {
+    t2.join();
+} catch (InterruptedException e) {
+    throw new RuntimeException(e);
+}
+```
+
+
+
+
+
+``多线程下如果t1进入if语句时还没执行完t2也进入了就会造成new两个对象``
+
+```java
+public class SingletonTest {
+
+    private static Singleton s1;
+    private static Singleton s2;
+
+    public static void main(String[] args) {
+
+        // 线程对象1
+        Thread t1 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                s1 = Singleton.getSingleton();
+            }
+        });
+
+        // 线程对象2
+        Thread t2 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                s2 = Singleton.getSingleton();
+            }
+        });
+
+        // 该方法只是启动线程，瞬间就结束了，run还没来得及结束，主线程就会执行下面的代码
+        t1.start();
+        t2.start();
+
+        try {
+            t1.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            t2.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        // 因为run还没执行，所以下面都是null和true
+        System.out.println(s1);
+        System.out.println(s2);
+        System.out.println(s1 == s2);
+
+    }
+}
+
+
+// 懒汉式单例模式
+class Singleton {
+
+    private static Singleton singleton;
+
+    private Singleton() {
+    }
+
+/*    第一种方案
+    public static synchronized Singleton getSingleton() {
+        if(singleton == null) {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            singleton = new Singleton();
+        }
+        return singleton;
+    }*/
+
+    // 第二种方案也是拿类锁
+    // 类名.class == 获取某个类
+    public static Singleton getSingleton() {
+        // 对象为空才去拿对象锁
+        if(singleton == null) {
+            synchronized (Singleton.class) {
+                if(singleton == null) {
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    singleton = new Singleton();
+                }
+            }
+        }
+        return singleton;
+    }
+}
+```
+
+
+
+
+
+## ReentrantLock可重入锁
+
+![image-20240925115438703](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409251154880.png)
+
+线程同步不一定得synchronized，可以用re/entrant/Lock替代，比sync更加灵活，**官方文档更建议使用ReentrantLock**
+
+``JUC == java.util.concurrent``
+
+
+
+```java
+import java.util.concurrent.locks.ReentrantLock;
+
+public class SingletonTest {
+
+    private static Singleton s1;
+    private static Singleton s2;
+
+    public static void main(String[] args) {
+
+        // 线程对象1
+        Thread t1 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                s1 = Singleton.getSingleton();
+            }
+        });
+
+        // 线程对象2
+        Thread t2 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                s2 = Singleton.getSingleton();
+            }
+        });
+
+        // 该方法只是启动线程，瞬间就结束了，run还没来得及结束，主线程就会执行下面的代码
+        t1.start();
+        t2.start();
+
+        try {
+            t1.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            t2.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        // 因为run还没执行，所以下面都是null和true
+        System.out.println(s1);
+        System.out.println(s2);
+        System.out.println(s1 == s2);
+
+    }
+}
+
+
+// 懒汉式单例模式
+class Singleton {
+
+    private static Singleton singleton;
+
+    private Singleton() {
+        System.out.println("构造方法执行了");
+    }
+
+
+    // 使用Lock实现线程安全
+    // Lock是接口, Java5开始引入
+    // Lock的一个实现类：ReentrantLock(可重入锁)
+    // 要想使多线程达到同步，假设让t1, t2, t3达到, 这里的lock就得是共享对象, 所以static不能去
+    private static final ReentrantLock lock = new ReentrantLock();
+
+    public static Singleton getSingleton() {
+        if(singleton == null) {
+            try {
+                // 加锁
+                lock.lock();
+                if(singleton == null) {
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    singleton = new Singleton();
+                }
+            } finally {
+                // 解锁，为了百分百解锁，使用finally
+                lock.unlock();
+            }
+        }
+        return singleton;
+    }
+}
+```
+
+
+
+
+
+## 实现线程的方式③
+
+``实现Callable接口中的call方法``
+
+
+
+```java
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+
+/**
+ * 实现Callable接口, 实现call方法。
+ * 这种方式可以获取线程的返回值。
+ * */
+
+public class Test2 {
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
+        FutureTask<Integer> task = new FutureTask<>(new Callable<Integer>() {
+            @Override
+            public Integer call() throws Exception {
+                // ....
+                Thread.sleep(1000 * 5);
+                return 1;
+            }
+        });
+
+        Thread t = new Thread(task);  // 本质还是Runnable
+
+        t.setName("t");
+        t.start();
+
+        // 获取未来任务的返回值
+        // 会阻塞当前的线程，因为只有等task的线程执行完以后才能拿返回值
+        Integer i = task.get();
+        System.out.println(i);
+    }
+}
+```
+
+
+
+
+
+## 实现线程的方式④
+
+``线程池Executors，本质也是缓存技术cache，顾名思义提前在池中创建好t1，t2，t3...线程，需要的时候直接拿，以此提高效率``
+
+
+
+```java
+// 一般是服务器启动的时候初始化
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+public class Test3 {
+    public static void main(String[] args) {
+
+        // 初始化线程池对象，初始化3个线程
+        ExecutorService executorService = Executors.newFixedThreadPool(3);
+
+        // 将任务交给线程池对象即可，不需要接触线程对象
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < 10; i++) {
+                    System.out.println(Thread.currentThread().getName() + " ----> " + i);
+                }
+            }
+        });
+
+        // 最后关闭线程池
+        executorService.shutdown();
+
+    }
+}
+
+```
+
+![image-20240930142231731](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409301422969.png)
 
 
 
@@ -7968,52 +8329,87 @@ public class ThreadTest {
 
 
 
+# 反射
+
+------
+
+``提供一套类库可以操作/读取class字节码文件``
+
+``反射机制最核心的几个类``
+
+``java.lang.Class: Class类型的实例代表硬盘上的某个class文件。或者说代表某一种类型。``
+
+***String.class文件***
+
+***System.class文件***
+
+***Date.class文件***
+
+``java.lang.reflect.Filed: Filed类型的实例代表``
+
+``java.lang.reflect.Constructor: Constructor类型的实例代表中的构造方法 ``
+
+``java.lang.reflect.Method: Method类型的实例代表中的方法``
+
+![image-20240930150221834](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409301502037.png)
 
 
 
+``①静态方法Class.forname("")``
+
+```java
+public class ReflectTest01 {
+    public static void main(String[] args) throws ClassNotFoundException {
+        // stringClass就代表字符串类型
+        // stringClass代表硬盘上的String.class文件
+
+        Class stringClass = Class.forName("java.lang.String");
+
+        Class userClass = Class.forName("Reflect.User");  // 会进行类加载
+    }
+}
+
+```
 
 
 
+``②obj.getClass()``
+
+```java
+public class ReflectTest01 {
+    public static void main(String[] args) throws ClassNotFoundException {
+        // stringClass就代表String类型
+        // stringClass代表硬盘上的String.class文件
+
+        Class stringClass = Class.forName("java.lang.String");
+
+        Class userClass = Class.forName("Reflect.User");  // 会进行类加载
+
+        String s = "wangcai";
+        Class stringClass2 = s.getClass();
+
+        // 某种类型的字节码文件在内存中只有一份
+        System.out.println(stringClass == stringClass2);  // true, 都是String类型
+
+    }
+}
+```
 
 
 
+``③在Java中, 任何一种类型包括基本数据类型都有.class属性, 该属性可以获取Class实例``
 
+```java
+public class ReflectTest01 {
+    public static void main(String[] args) throws ClassNotFoundException {
 
+        Class intClass = int.class;
+        Class stringClass = String.class;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        
+    }
+}
+```
 
 
 
