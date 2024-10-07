@@ -1077,7 +1077,7 @@ if() xxx;
 
 **字符串比较不能用 == ，必须手动调用equals方法进行比较**
 
-**因为==比较的是对象的值，字符串本质是String，自动装箱的因为会放在字符串常量池（String重写了equal方法）所以没问题。new出来的话就会造成其内存地址不一样而造成误判**
+**因为==比较的是内存地址，字符串本质是String，自动装箱的因为会放在字符串常量池（String重写了equal方法）所以没问题。new出来的话就会造成其内存地址不一样而造成误判**
 
 ```java
 String name = "wangcai"
@@ -1742,9 +1742,9 @@ public void setAge(int age) {
 // 使用new运算符调用
 ```
 
-构造方法名 == 类名（必须）
+**构造方法名 == 类名（必须）**
 
-> #### 构造方法会将new出的对象内存地址返回，但是我们不需要写 return，也不需要写返回值类型。
+> ##### 构造方法会将new出的对象内存地址返回，但是我们不需要写 return，也不需要写返回值类型。
 
 
 
@@ -1933,7 +1933,7 @@ public class Bird extends Animal {
 
 ![image-20240808141814629](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408081418732.png)
 
-> **3.4 访问权限不能变低可以变高。public protected 默认 private**
+> **3.4 访问权限不能变低可以变高。public protected 默认 private（高 ----> 低）**
 >
 > **3.5 抛出异常不能变多，只能变少。**
 
@@ -1959,7 +1959,7 @@ public class Bird extends Animal {
 
 <img src="https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408081530900.png" alt="image-20240808153042813" style="zoom: 67%;" />
 
-- ### **前提是两种类型必须有继承关系才能编译通过。**
+- #### **前提是两种类型必须有继承关系才能编译通过。**
 
 ```java
 package test;
@@ -2562,7 +2562,7 @@ public class OuterClass {
 
 #### 匿名内部类（重点）
 
-没有名字的类，**只能使用一次。**
+new接口和类都是可以的，最后是没有名字的类，**只能使用一次。**
 
 防止类爆炸
 
@@ -8345,7 +8345,7 @@ public class Test3 {
 
 ***Date.class文件***
 
-``java.lang.reflect.Filed: Filed类型的实例代表``
+``java.lang.reflect.Field: Field类型的实例代表``
 
 ``java.lang.reflect.Constructor: Constructor类型的实例代表中的构造方法 ``
 
@@ -8413,6 +8413,133 @@ public class ReflectTest01 {
 
 
 
+## 通过反射机制实例化对象
+
+``Class类型.newInstance()``
+
+```java
+public class ReflectTest02 {
+    public static void main(String[] args) throws Exception {
+
+        // 获取Class类型的实例后，通过反射机制实例化对象
+        Class<?> userClass = Class.forName("Reflect.User");
+
+        // 通过userClass实例化对象，userClass代表的就是User类型 Java9后标注过时
+        // 底层原理就是调用其无参构造方法完成实例化创建
+        User user = (User) userClass.newInstance();
+
+        System.out.println(user);
+
+    }
+}
+```
+
+
+
+## 结合配置文件灵活实例化对象
+
+在配置文件中存储className
+
+``.properties``
+
+```properties
+className=Reflect.User
+```
+
+
+
+```java
+import java.util.ResourceBundle;
+
+public class ReflectTest03 {
+    public static void main(String[] args) throws Exception {
+        ResourceBundle bundle = ResourceBundle.getBundle("Reflect.className");
+        String className = bundle.getString("className");
+
+        Class userClass = Class.forName(className);
+
+        Object o = userClass.newInstance();
+        System.out.println(o);
+
+    }
+}
+```
+
+
+
+## 反射Class的Field
+
+``Vip类``
+
+```java
+public class Vip {
+    public String name;
+
+    private int age;
+
+    protected String birth;
+
+    boolean gender;
+
+    public static String address = "四川成都";
+
+    public static final String GRADE = "金牌";
+}
+
+```
+
+``测试``
+
+```java
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+
+/**
+ * java.lang.reflect.Field(代表一个类中的字段/属性)
+ * */
+public class ReflectTest04 {
+    public static void main(String[] args) throws ClassNotFoundException {
+        // 拿到整个类
+        Class<?> vipClass = Class.forName("Reflect.Vip");
+
+        // 拿到公共的字段
+/*        Field[] fields = vipClass.getFields();
+
+        for (Field field : fields) {
+            System.out.println(field.getName());
+        }*/
+
+        // 获取所有字段，包括私有的
+        Field[] declaredFields = vipClass.getDeclaredFields();
+        for (Field field : declaredFields) {
+            // 获取属性名
+            System.out.println(field.getName());
+
+            // 获取属性类型
+            Class<?> type = field.getType();
+
+            // 获取属性类型的简单名字
+            System.out.println(type.getSimpleName());
+
+            // 获取修饰符
+            // System.out.println(field.getModifiers());  // int
+            System.out.println(Modifier.toString(field.getModifiers()));
+
+        }
+
+    }
+}
+```
+
+![image-20241007193415927](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410071934067.png)
+
+![image-20241007193916999](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410071939096.png)
+
+
+
+## 反编译的字段
+
+``反编译java.lang.String类中所有的属性``
 
 
 
@@ -8420,6 +8547,144 @@ public class ReflectTest01 {
 
 
 
+
+
+
+
+
+
+## 通过反射为对象属性赋值
+
+``Customer类``
+
+```java
+public class Customer {
+
+    private String name;
+    private int age;
+
+}
+
+```
+
+``main``
+
+```java
+import java.lang.reflect.Field;
+
+public class ReflectTest06 {
+    public static void main(String[] args) throws Exception {
+        Customer customer = new Customer();
+
+        // 通过反射机制访问Field，访问属性的值，给属性赋值。
+        // 获取类
+        Class customerClass = Class.forName("Reflect.Customer");
+
+        // 获取对应的Field字段
+        Field ageFiled = customerClass.getDeclaredField("age");
+
+        // 调用方法打破封装
+        ageFiled.setAccessible(true);
+
+        // 修改属性的值(set)
+        // 三要素：给哪个对象的哪个属性赋什么值
+        ageFiled.set(customer, 18);
+
+        // 读取属性的值
+        System.out.println(ageFiled.get(customer));
+
+    }
+}
+```
+
+
+
+
+
+## 反射一个类的Method
+
+``和Field类似``
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 通过反射机制调用方法
+
+``UserService``
+
+```java
+public class UserService {
+
+    public boolean login(String username, int password) {
+        if("admin".equals(username) && password == 123456) {
+            System.out.println("登录成功");
+            return true;
+        }
+
+        return false;
+    }
+
+    public void logout() {
+        System.out.println("退出系统");
+    }
+
+}
+```
+
+```java
+import java.lang.reflect.Method;
+
+public class ReflectTest08 {
+    public static void main(String[] args) throws Exception{
+        // 通过反射机制调用方法
+
+        // 创建对象
+        UserService userService = new UserService();
+
+        // 获取类
+        Class clazz = Class.forName("Reflect.UserService");
+
+        Method login = clazz.getDeclaredMethod("login", String.class, int.class);
+        
+        // 调用方法
+        Object retValue = login.invoke(userService, "admin", 123456);
+        System.out.println(retValue);
+
+
+    }
+}
+```
+
+
+
+
+
+## 反编译类的构造方法
+
+
+
+
+
+
+
+
+
+
+
+## 通过反射机制调用构造方法
 
 
 
