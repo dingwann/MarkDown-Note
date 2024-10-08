@@ -8686,7 +8686,194 @@ public class ReflectTest08 {
 
 ## 通过反射机制调用构造方法
 
+> **虽然xxx.newInstanc()也能创建，但是已经标注过时，而且必须得有无参构造，不然报错，所以不再建议使用。**
+>
+> **所以得通过Class类型拿到构造方法，再通过构造方法调用newInstance实例化对象**
 
+``Order类``
+
+```java
+public class Order {
+
+    private String no;
+    private double price;
+    private String name;
+
+
+    public Order() {
+    }
+
+    public Order(String no) {
+        this.no = no;
+    }
+
+    public Order(String no, double price) {
+        this.no = no;
+        this.price = price;
+    }
+
+    public Order(String no, double price, String name) {
+        this.no = no;
+        this.price = price;
+        this.name = name;
+    }
+
+    public String getNo() {
+        return no;
+    }
+
+    public void setNo(String no) {
+        this.no = no;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "no='" + no + '\'' +
+                ", price=" + price +
+                ", name='" + name + '\'' +
+                '}';
+    }
+}
+```
+
+``main类``
+
+```java
+import java.lang.reflect.Constructor;
+
+public class ReflectTest09 {
+    public static void main(String[] args) throws Exception{
+
+        // 获取类
+        Class clazz = Class.forName("Reflect.Order");
+
+        // 无参构造
+        Constructor declaredConstructor = clazz.getDeclaredConstructor();
+        Object o = declaredConstructor.newInstance();
+        System.out.println(o);
+
+        // 三个参数构造方法
+        Constructor threeConstructor = clazz.getDeclaredConstructor(String.class, double.class, String.class);
+        Object o1 = threeConstructor.newInstance("1", 3.14, "wangcai");
+        System.out.println(o1);
+
+    }
+}
+
+```
+
+![image-20241008135046267](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410081350444.png)
+
+
+
+
+
+## 通过反射机制实现框架部分内容
+
+``通过读取属性配置文件，获取类信息，方法信息，然后通过反射机制调用方法``
+
+
+
+
+
+
+
+
+
+
+
+## 类加载的过程
+
+![image-20241008140813856](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410081408050.png)
+
+
+
+
+
+## 获取Class的方式
+
+![image-20241008145910401](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410081459578.png)
+
+
+
+```java
+public class ReflectTest10 {
+    public static void main(String[] args) throws Exception{
+
+        // 通过类加载器获取Class
+        // 该方法不进行类的初始化，直到类进行第一次使用
+        ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
+        Class<?> userClass = systemClassLoader.loadClass("Reflect.User");
+
+    }
+}
+```
+
+
+
+
+
+## 虚拟机的三个类加载器
+
+![image-20241008201715427](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410082017607.png)
+
+
+
+```java
+public class ReflectTest11 {
+    public static void main(String[] args) {
+
+        // 获取类加载器的方式①
+        ClassLoader classLoader1 = ReflectTest11.class.getClassLoader();
+        System.out.println("应用类加载器: " + classLoader1);
+
+        // 获取类加载器的方式②
+        ClassLoader classLoader2 = ClassLoader.getSystemClassLoader();
+        System.out.println("应用类加载器: " + classLoader2);
+
+        // 获取类加载器的方式③
+        ClassLoader classLoader3 = Thread.currentThread().getContextClassLoader();
+        System.out.println("应用类加载器: " + classLoader3);
+
+        // 通过getParent()可以获取父类加载器
+        System.out.println("平台类加载器： " + classLoader3.getParent());
+
+        // 启动类加载器负责的是JDK的类库，这个类加载器名字看不到，直接输出是null
+        System.out.println("启动类加载器： " + classLoader3.getParent().getParent());
+
+
+    }
+}
+```
+
+
+
+
+
+## 双亲委派机制
+
+![image-20241008220017346](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410082200511.png)
+
+
+
+## 反射父类的泛型
 
 
 
