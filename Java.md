@@ -8875,6 +8875,966 @@ public class ReflectTest11 {
 
 ## 反射父类的泛型
 
+``Animal类``
+
+```java
+// 在类上定义泛型
+public class Animal<Z, X, C> {
+}
+```
+
+
+
+``Cat类``
+
+```java
+public class Cat extends Animal<String, Integer, Double> {
+}
+```
+
+
+
+``Test``
+
+```java
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
+public class ReflectTest12 {
+    public static void main(String[] args) {
+
+        // 获取子类继承的父类的泛型信息
+        // 获取类
+        Class<Cat> catClass = Cat.class;
+
+        // 获取父类的泛型
+        Type genericSuperclass = catClass.getGenericSuperclass();  // Type是个接口
+
+        /*
+        如果cat继承父类时没有用泛型，这里获取的就是个Class
+        System.out.println(genericSuperclass instanceof Class);  // 此时返回true
+        */
+
+        // 用了泛型
+        System.out.println(genericSuperclass instanceof ParameterizedType);  // true
+
+        if (genericSuperclass instanceof ParameterizedType) {
+            // 转型为参数化类型
+            ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
+            Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+
+            for (Type a : actualTypeArguments) {
+                System.out.println(a.getTypeName());  //
+            }
+
+        }
+
+    }
+}
+```
+
+![image-20241009094102077](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410090941234.png)
+
+
+
+
+
+## 反射接口的泛型
+
+``Flyable接口``
+
+```java
+public interface Flyable<X, Y> {
+}
+```
+
+
+
+``Mouse类``
+
+```java
+public class Mouse implements Flyable<String, Integer>, Comparable<Mouse>{
+    
+    @Override
+    public int compareTo(Mouse o) {
+        return 0;
+    }
+    
+}
+```
+
+
+
+``Test``
+
+```java
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
+public class ReflectTest13 {
+    public static void main(String[] args) {
+        // 获取类
+        Class<Mouse> mouseClass = Mouse.class;
+
+        Type[] genericInterfaces = mouseClass.getGenericInterfaces();  // 这里返回Type数组的原因是一个类可以实现多个接口
+
+        for (Type g : genericInterfaces) {
+            if (g instanceof ParameterizedType) {
+                ParameterizedType parameterizedType = (ParameterizedType) g;
+                Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+
+                for (Type a : actualTypeArguments) {
+                    System.out.println(a.getTypeName());
+                }
+            }
+        }
+
+    }
+}
+```
+
+![image-20241009094923511](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410090949604.png)
+
+
+
+
+
+## 反射属性上的泛型
+
+``User类``
+
+```java
+import java.util.Map;
+
+public class User {
+    
+    private Map<String, Integer> map;
+    
+}
+```
+
+
+
+``Test``
+
+```java
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
+public class ReflectTest14 {
+    public static void main(String[] args) throws Exception {
+        Class<User> userClass = User.class;
+
+        Field mapField = userClass.getDeclaredField("map");
+
+        Type genericType = mapField.getGenericType();
+
+        if (genericType instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) genericType;
+
+            Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+            for (Type a : actualTypeArguments) {
+                System.out.println(a.getTypeName());
+            }
+        }
+
+    }
+}
+```
+
+![image-20241009095826843](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410090958972.png)
+
+
+
+
+
+
+
+## 反射方法参数上的泛型
+
+``MyClass``
+
+```java
+import java.util.List;
+import java.util.Map;
+
+public class MyClass {
+
+    public void m(List<String> list, Map<String, Double> map) {
+
+    }
+
+}
+```
+
+
+
+``Test``
+
+```java
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.List;
+import java.util.Map;
+
+public class ReflectTest15 {
+    public static void main(String[] args) throws NoSuchMethodException {
+
+        Class<MyClass> myClassClass = MyClass.class;
+
+        Method m = myClassClass.getDeclaredMethod("m", List.class, Map.class);
+
+        Type[] genericParameterTypes = m.getGenericParameterTypes();
+
+        for (Type g : genericParameterTypes) {
+            if(g instanceof ParameterizedType) {
+                ParameterizedType parameterizedType = (ParameterizedType) g;
+
+                Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+
+                for (Type a : actualTypeArguments) {
+                    System.out.println(a.getTypeName());
+                }
+            }
+        }
+
+    }
+}
+```
+
+![image-20241009100526110](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410091005205.png)
+
+
+
+
+
+
+
+## 反射方法返回值和构造方法参数的泛型
+
+``和上面类似，方法拿方法，构造方法拿构造方法...``
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 注解
+
+------
+
+![image-20241009101412698](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410091014900.png)
+
+
+
+
+
+## Java预置注解
+
+![image-20241009102843710](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410091028254.png)
+
+
+
+## @Deprecated（已过时）
+
+``过时注解``
+
+```java
+package Annotation;
+
+public class AnnotationTest01 {
+
+    public static void main(String[] args) {
+        MyClass m = new MyClass();
+        m.m1();
+        int b = MyClass.a;
+    }
+
+}
+
+
+@Deprecated
+class MyClass {
+
+    // 从Java9版本开始, forRemoval = true代表移除
+    @Deprecated(since = "9", forRemoval = true)
+    public static int a = 100;
+
+    @Deprecated
+    public void m1() {
+
+    }
+
+}
+```
+
+![image-20241009110953463](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410091109577.png)
+
+![image-20241009111406865](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410091114981.png)
+
+
+
+
+
+
+
+
+
+## @Override（重写）
+
+``标注实例方法，代表重写父类方法``
+
+```java
+public class AnnotationTest02 {
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+    
+}
+```
+
+
+
+
+
+
+
+## @SuppressWarnings
+
+``SuppressWarnings("rawtypes")：抑制未使用泛型的警告``
+
+``SuppressWarnings("resource")：抑制未使用资源的警告``
+
+``SuppressWarnings("deprecation")：抑制使用了已过时资源时的警告``
+
+``SuppressWarnings("all")：抑制所有警告``
+
+
+
+> **实际中尽量不忽略警告，尽力去解决**
+
+
+
+```java
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+
+@SuppressWarnings("all")
+public class AnnotationTest03 {
+
+    public static void main(String[] args) throws Exception {
+
+        @SuppressWarnings("rawtypes")
+        List list = new ArrayList();
+
+        @SuppressWarnings("resource")
+        FileInputStream fis = new FileInputStream("e:/file.txt");
+
+        @SuppressWarnings("deprecation")
+        MyClass myClass = new MyClass();
+
+    }
+
+}
+```
+
+
+
+
+
+
+
+
+
+## 函数式接口注解
+
+> **JDK1.8+ 该注解标注的接口只能有一个抽象方法，但是默认方法或静态方法可以有多个**
+
+
+
+``FunctionalInterface``
+
+```java
+public class AnnotationTest04 {
+    public static void main(String[] args) {
+
+    }
+}
+
+// 函数式接口只允许一个抽象方法
+@FunctionalInterface
+interface MyInterface {
+    void m1();
+
+    // void m2();
+    
+    default void m3() {
+        System.out.println("...");
+    }
+
+    static void m4() {
+        System.out.println("...");
+    }
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+## 自定义注解
+
+![image-20241009115719700](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410091157854.png)
+
+
+
+> **所有自定义的注解，它的父类都是java.lang.annotation.Annotation**
+
+
+
+**参考Java内置的Deprecated**
+
+![image-20241009133505723](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410091335870.png)
+
+
+
+``自定义、使用``
+
+```java
+// 自定义的注解
+public @interface MyAnnotation {
+}
+```
+
+```java
+@MyAnnotation
+public class AnnotationTest05 {
+    @MyAnnotation
+    public static void main(String[] args) {
+        // 使用注解
+        @MyAnnotation
+        int a = 1000;
+    }
+
+    private void m1(@MyAnnotation String a) {
+
+    }
+}
+```
+
+
+
+``定义注解``
+
+```java
+public @interface DataBaseInfo {
+    /**
+     * 注解也可以定义属性，但是属性名后面得加（）
+     * */
+
+    String driver();
+    String url();
+    String user();
+    String password();
+    
+    // 指定默认值
+    /*
+    String driver() default "oracle.jdbc.driver.OracleDriver";
+    String url() default "";
+    String user() default "root";
+    String password() default "123456";
+    */
+
+}
+```
+
+``Test``
+
+```java
+public class AnnotationTest06 {
+
+    // 注解定义属性后，使用时必须给属性赋值，不然报错，除非定义时指定了默认值。
+    @DataBaseInfo(driver = "a", url = "xxx.com", user = "admin", password = "123")
+    public void connDB() {
+
+    }
+
+}
+```
+
+
+
+
+
+``注解属性可以是一维数组的形式``
+
+```java
+public @interface DataBaseInfo {
+    /**
+     * 注解也可以定义属性，但是属性名后面得加（）
+     * */
+
+    String driver() default "oracle.jdbc.driver.OracleDriver";
+    String url() default "";
+    String user() default "";
+    String password() default "";
+
+
+    String[] names();
+    int[] ints();
+}
+```
+
+```java
+public class AnnotationTest06 {
+
+    // 注解定义属性后，使用时必须给属性赋值，不然报错，除非定义时指定了默认值。
+    @DataBaseInfo(
+            driver = "a",
+            url = "xxx.com",
+            user = "admin",
+            password = "123",
+        	// 数组属性只有一个值的时候，{}可以省略
+            names = {"w", "c", "a"},
+            ints = 1
+    )
+    public void connDB() {
+
+    }
+
+}
+```
+
+
+
+
+
+``属性只有一个并且属性名是value，在使用时，value可以省略``
+
+```java
+public @interface DataBaseInfo {
+    
+    String value();
+    
+}
+
+```
+
+```java
+public class AnnotationTest06 {
+
+    // @DataBaseInfo(value="a")
+    @DataBaseInfo("a")
+    public void connDB() {
+
+    }
+
+}
+
+```
+
+
+
+
+
+## 元注解
+
+![image-20241009141605211](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410091416346.png)
+
+
+
+### ``注解的保持性``
+
+![image-20241009142755692](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410091427840.png)
+
+
+
+``MyAnnotation``
+
+```java
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+@Retention(value = RetentionPolicy.RUNTIME)
+/*
+    RetentionPolicy.SOURCE == 保留在java文件中
+    RetentionPolicy.ClASS == 保留在class文件中, 不能被反射
+    RetentionPolicy.RUNTIME == 保留在class文件中, 可以在运行阶段被反射
+*/
+public @interface MyAnnotation {
+
+}
+```
+
+```java
+@MyAnnotation
+public class Test {
+    public static void main(String[] args) {
+        Class<Test> testClass = Test.class;
+
+        // 获取这个类的指定注解
+        MyAnnotation declaredAnnotation = testClass.getDeclaredAnnotation(MyAnnotation.class);
+
+        System.out.println(declaredAnnotation);
+
+    }
+}
+
+```
+
+![image-20241009143805568](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410091438681.png)
+
+
+
+
+
+
+
+### ``设置注解可使用的位置``
+
+![image-20241009144221707](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410091442850.png)
+
+
+
+``TargetTest``
+
+```java
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
+
+@Target(ElementType.METHOD)  // 限定注解只能出现在方法上
+public @interface TargetTest {
+}
+
+```
+
+```java
+package MetaAnnotation;
+
+@MyAnnotation
+// @TargetTest 这里不能使用
+public class Test {
+    @TargetTest  // 这里可以用
+    public static void main(String[] args) {
+    }
+}
+```
+
+
+
+
+
+### ``设置注解可以文档化``
+
+![image-20241009145016909](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410091450051.png)
+
+
+
+
+
+![image-20241009150013877](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410091500043.png)
+
+
+
+
+
+
+
+
+
+### ``设置注解可以继承``
+
+![image-20241009150305321](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410091503450.png)
+
+
+
+``InheritedTest``
+
+```java
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+@Inherited
+@Retention(RetentionPolicy.RUNTIME)
+public @interface InheritedTest {
+}
+```
+
+``继承关系父子类``
+
+```java
+@InheritedTest
+public class Animal {
+}
+```
+
+```java
+public class Cat extends Animal {
+}
+```
+
+``Test``
+
+```java
+public class Test1 {
+    public static void main(String[] args) {
+        
+        Class<Cat> catClass = Cat.class;
+        InheritedTest declaredAnnotation = catClass.getAnnotation(InheritedTest.class);
+        System.out.println(declaredAnnotation);
+        
+    }
+
+}
+```
+
+![image-20241009151645511](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410091516635.png)
+
+
+
+
+
+
+
+
+
+### ``设置注解可以重复使用``
+
+![image-20241009151803991](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410091518113.png)
+
+
+
+``Repeatble参数为注解名的复数形式.class``
+
+``注解名字+s的注解里面属性固定为：注解名[] value()``
+
+
+
+``Author``
+
+```java
+import java.lang.annotation.Repeatable;
+
+@Repeatable(Authors.class)
+public @interface Author {
+    String name();
+}
+```
+
+``Authors``
+
+```java
+public @interface Authors {
+
+    Author[] value();
+
+}
+```
+
+``Test``
+
+```java
+public class Test2 {
+
+    @Author(name = "w")
+    @Author(name = "c")
+    public void doSome() {
+
+    }
+
+}
+```
+
+
+
+
+
+
+
+
+
+## 通过反射机制读取注解
+
+![image-20241009152820179](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410091528347.png)
+
+``isAnnotationPresent：判断有没有这个注解 ``
+
+
+
+> **通过反射获取注解**
+
+``Annotation1``
+
+```java
+import java.lang.annotation.*;
+
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+@Documented
+public @interface Annotation1 {
+
+    String name();
+    int age();
+
+}
+```
+
+``Annotation2``
+
+```java
+import java.lang.annotation.*;
+
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+@Documented
+public @interface Annotation2 {
+
+    String email();
+    double price();
+
+}
+```
+
+``Myclass``
+
+```java
+@Annotation1(name = "wc", age = 18)
+@Annotation2(email = "xdd@qq.com", price = 3.14)
+public class Myclass {
+
+}
+```
+
+``Test``
+
+```java
+import java.lang.annotation.Annotation;
+
+public class Test {
+    public static void main(String[] args) {
+        Class<Myclass> myClass = Myclass.class;
+
+        // 获取类上的所有注解
+        Annotation[] annotations = myClass.getAnnotations();
+        for (Annotation a : annotations) {
+            System.out.println(a);
+        }
+
+        // 先判断该类上是否存在该注解
+        if(myClass.isAnnotationPresent(Annotation1.class)) {
+            // 获取指定的注解
+            Annotation1 a1 = myClass.getAnnotation(Annotation1.class);
+            // 访问注解对象中的属性
+            System.out.println(a1.name());
+            System.out.println(a1.age());
+
+        }
+
+
+    }
+}
+```
+
+![image-20241009205950876](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410092059040.png)
+
+
+
+
+
+
+
+
+
+## 递归+注解+反射综合练习
+
+![image-20241009213037162](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410092130324.png)
+
+
+
+
+
+
+
+
+
+
+
+# 网络编程
+
+## 概述
+
+![image-20241009213408081](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410092134238.png)
+
+
+
+``IP + 端口号 + 通信协议``
+
+
+
+
+
+## IP地址
+
+![image-20241009214030181](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410092140381.png)
+
+
+
+
+
+## 域名和DNS
+
+![image-20241009215016789](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410092150957.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
