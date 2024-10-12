@@ -3571,6 +3571,8 @@ public void testFormatDate() throws ParseException {
 }
 ```
 
+
+
 > **Java8+ 新的日期API**
 
 ![image-20240822231508422](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408222315614.png)
@@ -3616,6 +3618,31 @@ public void testDate1() {
 
 ![image-20240822233526191](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408222335313.png)
 
+
+
+```java
+import java.time.Duration;
+import java.time.LocalDateTime;
+
+public class Test {
+    public static void main(String[] args) throws Exception{
+
+        LocalDateTime localDateTime = LocalDateTime.of(2008, 8, 8, 8, 8, 8);
+        LocalDateTime localDateTime1 = LocalDateTime.of(2009, 9, 9, 9, 9, 9);
+        Duration between = Duration.between(localDateTime, localDateTime1);
+
+        long hours = between.toHours();
+        System.out.println(hours);  // 9529
+
+        long days = between.toDays();
+        System.out.println(days);  // 397
+
+    }
+}
+```
+
+
+
 ![image-20240822233847225](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408222338435.png)
 
 <img src="https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202408222340551.png" alt="image-20240822234058413" style="zoom: 67%;" />
@@ -3660,13 +3687,14 @@ public enum Season implements Eatable{
     SUMMER("夏季", "x"),
     AUTUMN("秋季", "x"),
     WINTER("冬季", "x");
-    // 另外一种实现接口方式
+    /* 另外一种实现接口方式
     WINTER("冬季", "x") {
         @Override
         public void eat() {
             ...
         }
     };
+    */
     
     private String name;
     private String desc;
@@ -4228,7 +4256,7 @@ key主导，value是附属作用。
 
 ![image-20240907155543582](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409071555679.png)
 
-  遍历Map集合：
+遍历Map集合：
 
 ```java
 // 对key进行遍历用get得到其value
@@ -4267,6 +4295,8 @@ Set<Map.Entry<Integer, String>> entries = maps.entrySet();
 上面是单向链表，其Node结点有四个属性，put方法的本质就是new node结点
 
 hash值是调用根类中的hashCode方法根据key得到的
+
+
 
 ![image-20240910100341526](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409101003660.png)
 
@@ -4630,7 +4660,7 @@ public class Hashtable {
 
 
 
->  sort排序集合元素为自定义类型时也需要实现排序接口或者比较器进行排序。
+>  **sort排序集合元素为自定义类型时也需要实现排序接口或者比较器进行排序。**
 
 
 
@@ -4897,7 +4927,7 @@ public void bufferedOutputStreamTest() {
 
 > **BufferedReader和BufferedWriter同理**
 
-**BufferedReader中有个方法readLine()是按\n读取一行，当读不到或者末尾了时返回 null 值而不是 -1**
+``BufferedReader中有个方法readLine()是按\n读取一行，当读不到或者末尾了时返回 null 值而不是 -1``
 
 
 
@@ -4977,7 +5007,7 @@ public void markAndresetTest() {
 
 ![image-20240917162306784](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409171623002.png)
 
-测试的时候用append方式，不然默认会将文档改成平台默认编码UTF-8
+测试的时候用append方式，不然默认会将测试文档的原有字符集改成平台默认编码UTF-8
 
 
 
@@ -5144,7 +5174,7 @@ public void dataOutputStreamTest() {
 
 
 
-## 序列化和反序列化
+## 序列化和反序列化（对象）
 
 ![image-20240917215338721](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409172153815.png)
 
@@ -5687,13 +5717,15 @@ public void bundleProperties() {
 - **因为实现同一个接口以后，对于客户端程序来说，使用装饰者时就像在使用被装饰者一样**
 - **装饰者中含有被装饰者的引用（A has a B），尽量使用has a[耦合度低一些]，不要使用is a**
 
+``has a == 关联关系，存在其实例属性位置``
+
+``is a == 继承关系 ``
+
 
 
 > **简易实现**
 
 ```java
-package DecoratorTest;
-
 // 被装饰者
 
 public interface flyable {
@@ -5702,8 +5734,6 @@ public interface flyable {
 ```
 
 ```java
-package DecoratorTest;
-
 // 被装饰者
 
 public class Bird implements flyable{
@@ -5715,8 +5745,6 @@ public class Bird implements flyable{
 ```
 
 ```java
-package DecoratorTest;
-
 public class dog implements flyable{
     @Override
     public void fly() {
@@ -5726,8 +5754,6 @@ public class dog implements flyable{
 ```
 
 ```java
-package DecoratorTest;
-
 /**
  *  装饰者
  *  有一个被装饰者的引用。
@@ -5757,9 +5783,6 @@ public class DecoratorFlyable implements flyable{
 ```
 
 ```java
-package DecoratorTest;
-
-
 public class DecoratorTest {
     public static void main(String[] args) {
 
@@ -5896,7 +5919,7 @@ public class DecoratorTest {
 
 ![image-20240919141645464](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202409191416595.png)
 
-
+ 
 
 ```java
 @Test
@@ -9815,6 +9838,644 @@ public class Test {
 
 
 
+## 端口号port
+
+![image-20241010220802411](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410102208664.png)
+
+
+
+
+
+
+
+
+
+## 通信协议
+
+![image-20241011124923799](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410111249028.png)
+
+
+
+
+
+
+
+## OSI参考模型
+
+![image-20241011125355223](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410111253431.png)
+
+
+
+
+
+
+
+## TCP/IP参考模型
+
+![image-20241011130229488](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410111302662.png)
+
+
+
+
+
+## InetAddress类
+
+![image-20241011130706016](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410111307174.png)
+
+
+
+```java
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
+public class InetAddressTest {
+
+    public static void main(String[] args) throws UnknownHostException {
+
+        // 获取本机的IP + 主机名的封装对象
+        InetAddress localHost = InetAddress.getLocalHost();
+
+        // 获取本机的IP地址
+        String hostAddress = localHost.getHostAddress();
+        System.out.println("本机的IP地址：" + hostAddress);  // 本机的IP地址：192.168.32.1
+
+        // 获取本机的主机名
+        String hostName = localHost.getHostName();
+        System.out.println("本机的主机名：" + hostName);     // 本机的主机名：LAPTOP-ECCDVE9O
+
+        // 通过域名获取InetAddress对象
+        InetAddress byName = InetAddress.getByName("www.baidu.com");
+        System.out.println(byName.getHostAddress());   // 39.156.66.18
+        System.out.println(byName.getHostName());  // www.baidu.com
+
+    }
+
+}
+```
+
+
+
+
+
+
+
+## URL类
+
+![image-20241011131918311](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410111319542.png)
+
+
+
+```java
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.UnknownHostException;
+
+public class InetAddressTest {
+    public static void main(String[] args) throws UnknownHostException, MalformedURLException {
+
+        URL url = new URL("https://www.baidu.com:8000/api/user/login?username=admin&password=123#tip");
+
+        String protocol = url.getProtocol();
+        System.out.println("协议：" + protocol);
+
+        String path = url.getPath();
+        System.out.println("资源路径：" + path);
+
+        // 获取默认端口号 http默认80, https默认443
+        int defaultPort = url.getDefaultPort();
+        System.out.println("默认端口：" + defaultPort);
+
+        // 获取当前端口
+        int port = url.getPort();
+        System.out.println("当前端口：" + port);
+
+        // 获取主机地址
+        String host = url.getHost();
+        System.out.println("主机地址：" + host);
+
+        // 获取URL的数据
+        String query = url.getQuery();
+        System.out.println("需要提交给服务器的数据：" + query);
+
+        // 获取描点
+        String ref = url.getRef();
+        System.out.println("获取锚点：" + ref);
+
+        // 资源路径加数据
+        String file = url.getFile();
+        System.out.println(file);
+
+    }
+
+}
+```
+
+![image-20241011222543373](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410112225637.png)
+
+
+
+```java
+package Inet;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+public class InetAddressTest {
+    public static void main(String[] args) throws IOException {
+
+        URL url = new URL("https://tianqi.qq.com/");
+
+        InputStream inputStream = url.openStream();
+
+        byte[] bytes = new byte[1024];
+        int readCount = 0;
+        while ((readCount = inputStream.read(bytes)) != -1) {
+            String s = new String(bytes);
+            System.out.println(s);
+        }
+
+    }
+
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+## TCP/UDP协议
+
+![image-20241011225205846](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410112252108.png)
+
+
+
+![image-20241011225258109](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410112252276.png)
+
+![image-20241011225623333](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410112256463.png)
+
+
+
+
+
+## TCP的三次握手（通道打开）
+
+![image-20241011225905662](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410112259849.png)
+
+![image-20241011230004831](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410112300995.png)
+
+
+
+
+
+
+
+
+
+
+
+## TCP的四次挥手（通道关闭）
+
+![image-20241011225930697](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410112259887.png)
+
+
+
+
+
+
+
+
+
+## 基于TCP的编程
+
+![image-20241012120052216](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410121200474.png)
+
+<img src="https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410121202355.png" alt="image-20241012120255189" style="zoom:80%;" />
+
+
+
+
+
+``Client``
+
+![image-20241012162310424](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410121623682.png)
+
+
+
+
+
+``Server``
+
+![image-20241012162405674](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410121624866.png)
+
+
+
+
+
+## 实现单向通信
+
+![image-20241012202619480](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410122026684.png)
+
+
+
+``Cilent``
+
+```java
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+public class Client {
+    public static void main(String[] args) throws UnknownHostException {
+
+        InetAddress ia = InetAddress.getLocalHost();
+
+        Socket cilentsocket = null;
+        BufferedWriter bw = null;
+        // 创建客户端套接字对象
+        try {
+
+            int port = 8888;
+            cilentsocket = new Socket(ia, port);
+
+            // 客户端向服务端发送消息
+            bw = new BufferedWriter(new OutputStreamWriter(cilentsocket.getOutputStream()));
+
+            // 发送消息
+            bw.write("你好！");
+            bw.write("hhhh");
+            bw.write("\n");
+            bw.write("嘿嘿嘿嘿嘿");
+
+            bw.flush();
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }finally {
+            if (bw != null) {
+                try {
+                    bw.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            if (cilentsocket != null) {
+                try {
+                    cilentsocket.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+    }
+}
+```
+
+
+
+``Server``
+
+```java
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+public class Server {
+    public static void main(String[] args) {
+        ServerSocket serverSocket = null;
+        Socket clientSocket = null;
+        BufferedReader br = null;
+        try {
+            // 启动服务器端
+            int port = 8888;
+            serverSocket = new ServerSocket(port);
+
+            System.out.println("服务器启动完成...");
+
+            // 接受客户端套接字
+            clientSocket = serverSocket.accept();
+
+            // 服务端接受消息
+            br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+            // 读取
+            String s = null;
+            while ((s = br.readLine()) != null) {
+                System.out.println(s);
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            if (clientSocket != null) {
+                try {
+                    clientSocket.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            if (serverSocket != null) {
+                try {
+                    serverSocket.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+    }
+
+}
+```
+
+
+
+
+
+
+
+
+
+## 实现双向通信
+
+![image-20241012202637425](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410122026563.png)
+
+
+
+> **实现发送图片并返回消息**
+
+
+
+``Server``
+
+```java
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+public class TwoServer {
+    public static void main(String[] args) {
+
+        ServerSocket serverSocket = null;
+        BufferedInputStream bis = null;
+        Socket cilentSocket = null;
+        BufferedOutputStream bos = null;
+        BufferedWriter bw = null;
+
+        try {
+            serverSocket = new ServerSocket(8888);
+            System.out.println("服务启动成功");
+
+            // 客户端套接字
+            cilentSocket = serverSocket.accept();
+
+            // 获取流
+            bis = new BufferedInputStream(cilentSocket.getInputStream());
+
+            // 新建输出流
+            bos = new BufferedOutputStream(new FileOutputStream("./a.png"));
+
+            // 开始读
+            byte[] bytes = new byte[1024];
+            int readCount = 0;
+            while ((readCount = bis.read(bytes)) != -1) {
+                // 将图片写入到服务器的硬盘上
+                bos.write(bytes, 0, readCount);
+            }
+
+            bos.flush();
+
+            // 服务器接收完后返回消息
+            bw = new BufferedWriter(new OutputStreamWriter(cilentSocket.getOutputStream()));
+            bw.write("已收到图片 \n");
+
+            bw.flush();
+
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }finally {
+            if (bw != null) {
+                try {
+                    bw.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            if (bis != null) {
+                try {
+                    bis.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            if (serverSocket != null) {
+                try {
+                    serverSocket.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            if (bos != null) {
+                try {
+                    bos.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            if (cilentSocket != null) {
+                try {
+                    cilentSocket.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+    }
+}
+```
+
+
+
+``Client``
+
+```java
+import java.io.*;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+public class TwoCilent {
+    public static void main(String[] args) throws UnknownHostException {
+        Socket socket = null;
+        BufferedOutputStream bos = null;
+        BufferedInputStream bis = null;
+        BufferedReader br = null;
+
+        try {
+            socket = new Socket(InetAddress.getLocalHost(), 8888);
+
+            // 发送图片给服务器
+            bos = new BufferedOutputStream(socket.getOutputStream());
+
+            // 写图片到服务器
+            // 一边读一边写（读本地图片，写入到服务器）
+            bis = new BufferedInputStream(new FileInputStream("E:\\sx\\hh.png"));
+
+            byte[] bytes = new byte[1024];
+            int readCount = 0;
+            while ((readCount = bis.read(bytes)) != -1) {
+                bos.write(bytes, 0, readCount);
+            }
+
+            bos.flush();
+
+            // 关闭向服务器的输出
+            socket.shutdownOutput();
+
+            // 收服务器返回的消息
+            br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            String s = null;
+            while ((s = br.readLine()) != null) {
+                System.out.println(s);
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            if (bis != null) {
+                try {
+                    bis.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            if (bos != null) {
+                try {
+                    bos.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            if (socket != null) {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+    }
+}
+```
+
+
+
+
+
+
+
+
+
+## 基于UDP的网络编程
+
+![image-20241012202716465](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410122027595.png)
+
+
+
+![image-20241012202745568](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410122027692.png)
+
+
+
+![image-20241012202816192](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410122028323.png)
+
+
+
+``Receive``
+
+```java
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+
+public class Receive {
+    public static void main(String[] args) throws IOException {
+
+        DatagramSocket ds = new DatagramSocket(8888);
+
+        // 准备一个包接收数据
+        byte[] bytes = new byte[64 * 1024];
+        DatagramPacket dp = new DatagramPacket(bytes, bytes.length);
+
+        // 程序到这停下来等待接收
+        ds.receive(dp);
+
+        // 执行到这说明接收完成了
+        String msg = new String(bytes, 0, dp.getLength());
+        System.out.println("接收的数据：" + msg);
+
+        ds.close();
+
+    }
+}
+```
+
+
+
+
+
+
+
+``Send``
+
+```java
+import java.io.IOException;
+import java.net.*;
+
+public class Send {
+    public static void main(String[] args) throws IOException {
+
+        DatagramSocket ds = new DatagramSocket();
+
+        byte[] bytes = "哈哈哈🙂".getBytes();
+        DatagramPacket dp = new DatagramPacket(bytes, 0, bytes.length, InetAddress.getLocalHost(), 8888);
+
+        ds.send(dp);
+
+        ds.close();
+
+    }
+}
+```
 
 
 
@@ -9830,6 +10491,105 @@ public class Test {
 
 
 
+# Lambda表达式
+
+![image-20241012204549102](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410122045311.png)
+
+
+
+```java
+package lambda;
+
+import java.util.Comparator;
+import java.util.TreeSet;
+
+public class Test01 {
+    public static void main(String[] args) {
+        // 匿名内部类写法
+        /*
+        TreeSet<User> user = new TreeSet<>(new Comparator<User>() {
+            @Override
+            public int compare(User o1, User o2) {
+                return o2.getAge() - o1.getAge();
+            }
+        });
+        */
+
+        /**
+         * lambda表达式()代表函数式接口中的抽象方法的()，{}代表其方法体
+         * 参数上的类型可以省, 语句只有一句时{}也可以省, 此时的return也能省
+         * */
+        
+        TreeSet<User> user = new TreeSet<>((o1, o2) -> o1.getAge() - o2.getAge());
+        
+        /*
+        TreeSet<User> user = new TreeSet<>((User o1, User o2) -> {
+            return o2.getAge() - o1.getAge();
+        });
+        */
+
+
+        User user1 = new User(10);
+        User user2 = new User(20);
+        User user3 = new User(30);
+        User user4 = new User(40);
+
+        user.add(user1);
+        user.add(user2);
+        user.add(user3);
+        user.add(user4);
+
+        System.out.println(user);
+
+    }
+}
+
+class User {
+
+    private int age;
+
+    public User(int age) {
+        this.age = age;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "age=" + age +
+                '}';
+    }
+}
+```
+
+
+
+
+
+## 函数式编程
+
+![image-20241012224050782](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410122240032.png)
+
+
+
+``怎么理解函数式接口``
+
+![image-20241012225046008](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410122250168.png)
+
+
+
+
+
+## Lambda和匿名内部类
+
+![image-20241012225148513](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410122251625.png)
 
 
 
@@ -9837,35 +10597,9 @@ public class Test {
 
 
 
+## Lambda语法
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+![image-20241012230842449](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410122308611.png)
 
 
 
