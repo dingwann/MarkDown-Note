@@ -10607,6 +10607,295 @@ class User {
 
 
 
+## 无返回值函数接口
+
+
+
+> **无返回值无参数的函数接口**
+
+
+
+```java
+public class Test02 {
+    public static void main(String[] args) {
+        // 匿名内部类
+        NoParamNoReturn npnr = new NoParamNoReturn() {
+            @Override
+            public void test() {
+                System.out.println("NoParameterNoReturn...");
+            }
+        };
+        npnr.test();
+
+        NoParamNoReturn npnr2 = () -> {
+            System.out.println("NoParameterNoReturn...");
+        };
+        npnr2.test();
+
+    }
+}
+
+@FunctionalInterface
+interface NoParamNoReturn {
+    void test();
+}
+```
+
+
+
+
+
+> **无返回值一个参数**
+
+
+
+```java
+public class Test03 {
+    public static void main(String[] args) {
+        // 匿名内部类
+        OneParameterNoReturn opnr = new OneParameterNoReturn() {
+            @Override
+            public void test(Integer num) {
+                System.out.println("无返回值一个参数: " + num);
+            }
+        };
+        opnr.test(100);
+
+        // Lambda
+        OneParameterNoReturn opnr2 = (Integer num) -> {
+            System.out.println("无返回值一个参数: " + num);
+        };
+        opnr2.test(200);
+
+    }
+}
+
+@FunctionalInterface
+interface OneParameterNoReturn {
+    void test(Integer num);
+}
+```
+
+
+
+
+
+> **无返回值多个参数**
+
+
+
+```java
+public class Test04 {
+    public static void main(String[] args) {
+        // 匿名内部类
+        MoreParameterNoReturn mpnr = new MoreParameterNoReturn() {
+            @Override
+            public void test(Integer num, String s) {
+                System.out.println("Integer----> " + num + ", String----> " + s);
+            }
+        };
+        mpnr.test(1, "wangcai");
+
+        // Lambda
+        MoreParameterNoReturn mpnr2 = (Integer num, String s) -> {
+            System.out.println("Integer----> " + num + ", String----> " + s);
+        };
+        mpnr2.test(2, "dingwan");
+
+    }
+}
+
+@FunctionalInterface
+interface MoreParameterNoReturn {
+    void test(Integer num, String s);
+}
+```
+
+
+
+
+
+
+
+## 有返回值函数接口
+
+
+
+> **有返回值无参数**
+
+
+
+```java
+public class Test05 {
+    public static void main(String[] args) {
+        // 匿名内部类
+        NoParamHasReturn noParamHasReturn = new NoParamHasReturn() {
+            @Override
+            public Integer test() {
+                return 1;
+            }
+        };
+        System.out.println(noParamHasReturn.test());
+
+        NoParamHasReturn noParamHasReturn1 = () -> {
+            return 2;
+        };
+        System.out.println(noParamHasReturn1.test());
+
+    }
+}
+
+@FunctionalInterface
+interface NoParamHasReturn {
+    Integer test();
+}
+```
+
+
+
+
+
+
+
+> **有返回值一个参数**
+
+
+
+```java
+public class Test06 {
+    public static void main(String[] args) {
+        // 匿名内部类
+        OneParamHasReturn oneParamHasReturn = new OneParamHasReturn() {
+            @Override
+            public Integer test(Integer num) {
+                System.out.println("num----> " + num);
+                return 1;
+            }
+        };
+        System.out.println(oneParamHasReturn.test(100));
+
+        OneParamHasReturn oneParamHasReturn1 = (Integer num) -> {
+            System.out.println("num----> " + num);
+            return 2;
+        };
+        System.out.println(oneParamHasReturn1.test(200));
+
+    }
+}
+
+@FunctionalInterface
+interface OneParamHasReturn {
+    Integer test(Integer num);
+}
+```
+
+
+
+
+
+> **有返回值多个参数**
+
+
+
+```java
+public class Test07 {
+    public static void main(String[] args) {
+        // 匿名内部类
+        MoreParamHasReturn mphr = new MoreParamHasReturn() {
+            @Override
+            public Integer test(Integer num, String s) {
+                System.out.println("Integer----> " + num + ", String----> " + s);
+                return 1;
+            }
+        };
+        mphr.test(100, "aaa");
+
+        // Lambda
+        MoreParamHasReturn mphr1 = (Integer num, String s) -> {
+            System.out.println("Integer----> " + num + ", String----> " + s);
+            return 2;
+        };
+        mphr1.test(200, "bbb");
+
+    }
+}
+
+@FunctionalInterface
+interface MoreParamHasReturn {
+    Integer test(Integer num, String s);
+}
+```
+
+
+
+
+
+
+
+## Lambda语法精简
+
+![image-20241013111804538](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410131118686.png)
+
+
+
+
+
+
+
+
+
+## JDK内置函数接口
+
+![image-20241013112509403](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410131125524.png)
+
+
+
+``消费型接口 ==== 消费``
+
+``供给型接口 ==== 生产``
+
+``函数式接口 ==== 转换``
+
+``判断型接口 ==== 判断``
+
+
+
+
+
+
+
+
+
+## Lambda的方法引用
+
+![image-20241013205623651](https://blog-wc-imgs.oss-cn-chengdu.aliyuncs.com/imgs/md/202410132056852.png)
+
+
+
+> **实例方法引用**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
